@@ -12,7 +12,9 @@ async def create_project(
     project_name: str = Form(...),
     csv_file: UploadFile = File(...),
     url: str = Form(...),
-    background_tasks: BackgroundTasks = None
+    deployment_url: str = Form(...), 
+    background_tasks: BackgroundTasks = None,
+       
 ):
     try:
         # Read CSV content
@@ -27,6 +29,7 @@ async def create_project(
         project_data = {
             "project_name": project_name,
             "url": url,
+            # "deployment_url": deployment_url,
             "vulnerabilities": normalized_data,
             "created_at": datetime.now(tz=timezone.utc),
             "indexing_status": "pending"
