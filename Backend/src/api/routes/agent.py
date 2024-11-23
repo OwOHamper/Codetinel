@@ -11,13 +11,14 @@ from datetime import datetime, timezone
 
 from src.AI.tools.custom_tool import CustomSearchTool
 from src.AI.agents.base_agent import AgentManager
+from src.config import settings
 
 load_dotenv()
 
 router = APIRouter()
 
 # Initialize the agent manager
-agent_manager = AgentManager(openai_api_key=os.getenv("OPENAI_API_KEY"))
+agent_manager = AgentManager(openai_api_key=settings.OPENAI_API_KEY)
 
 async def store_task_status(task_id: str, status: Dict):
     """Store task status in MongoDB"""

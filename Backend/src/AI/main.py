@@ -6,6 +6,7 @@ from uuid import uuid4
 from src.db.mongodb import get_database
 from datetime import datetime
 from src.AI.agents.pentest_agent import PentestAgent
+from src.config import settings
 
 load_dotenv()
 
@@ -13,7 +14,7 @@ app = FastAPI()
 
 # Initialize the pentest agent
 agent = PentestAgent(
-    openai_api_key=os.getenv("OPENAI_API_KEY"),
+    openai_api_key=settings.OPENAI_API_KEY,
     target_url=os.getenv("TARGET_URL", "http://example.com")
 )
 
