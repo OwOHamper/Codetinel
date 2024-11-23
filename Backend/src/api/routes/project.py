@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, BackgroundTasks
 from src.db.mongodb import get_database
-from src.models.todo import Todo, TodoCreate
 from datetime import datetime
 from bson import ObjectId
 import pandas as pd
