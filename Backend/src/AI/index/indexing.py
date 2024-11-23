@@ -9,6 +9,7 @@ from src.db.mongodb import get_database
 from bson import ObjectId
 from langchain_core.documents import Document
 import traceback
+import fnmatch
 
 # Define base directory for repositories
 BASE_REPOS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "data")
@@ -37,13 +38,44 @@ IGNORED_DIRS = {
     'coverage',
     '.next',
     '.idea',
-    '.vscode'
+    '.vscode',
+    'test',  # Skip test directories
+    'frontend/src/assets',  # Skip asset files
+    'frontend',
+    'rsn',  # Skip rsn directory
+    'views'  # Skip views directory
+}
+
+# Files to ignore (relative paths)
+IGNORED_FILES = {
+    'karma.conf.js',
+    'webpack.angular.js',
+    '.eslintrc.js',
+    '.stylelintrc.js',
+    'polyfills.ts',
+    'test.ts',
+    'index.html',
+    'environment.ts',
+    'environment.prod.ts',
+    '*.spec.ts',  # Skip all test spec files
+    '*.min.js',   # Skip minified files
+    'three.js'    # Skip three.js library
 }
 
 def should_ignore_path(path: str) -> bool:
     """Check if a path should be ignored"""
     path_parts = Path(path).parts
-    return any(ignored_dir in path_parts for ignored_dir in IGNORED_DIRS)
+    
+    # Check ignored directories
+    if any(ignored_dir in path_parts for ignored_dir in IGNORED_DIRS):
+        return True
+        
+    # Check ignored files
+    file_name = os.path.basename(path)
+    if any(fnmatch.fnmatch(file_name, pattern) for pattern in IGNORED_FILES):
+        return True
+        
+    return False
 
 def get_local_repo_path(repo_url: str) -> str:
     """Get the local path for a repository URL"""
@@ -84,6 +116,7 @@ def read_code_files(repo_path: str) -> list[Document]:
                     with open(file_path, 'r', encoding='utf-8') as f:
                         content = f.read()
                     
+                    # print(f"Read file {relative_path}")
                     # Create a Document with metadata
                     doc = Document(
                         page_content=content,
@@ -112,14 +145,14 @@ async def index_repository(project_id: str, repo_url: str) -> Dict[str, Any]:
         # Read all code files
         documents = read_code_files(repo_path)
         print(f"Loaded {len(documents)} code files")
-        
+
         if not documents:
             raise Exception("No code files found in repository")
         
         # Split documents into chunks
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200,
+            chunk_size=1500,
+            chunk_overlap=300,
             separators=["\n\n", "\n", " ", ""]
         )
         splits = text_splitter.split_documents(documents)
@@ -129,18 +162,25 @@ async def index_repository(project_id: str, repo_url: str) -> Dict[str, Any]:
         for split in splits:
             split.metadata["project_id"] = project_id
         
-        # Create embeddings and store in ChromaDB
+        # Get the ChromaDB client and its max batch size
+        # chroma_client = Chroma(persist_directory="./chroma_db")
+        max_batch_size = 166 
+        
+        # Create embeddings
         print("Creating embeddings and storing in ChromaDB")
         embeddings = OpenAIEmbeddings()
-        vectorstore = Chroma.from_documents(
-            documents=splits,
-            embedding=embeddings,
-            collection_name=f"project_{project_id}",
-            persist_directory="./chroma_db"
-        )
         
-        # Persist the vectorstore
-        vectorstore.persist()
+        # Process splits in batches
+        for i in range(0, len(splits), max_batch_size):
+            batch = splits[i:i + max_batch_size]
+            vectorstore = Chroma.from_documents(
+                documents=batch,
+                embedding=embeddings,
+                collection_name=f"project_{project_id}",
+                persist_directory="./chroma_db"
+            )
+            # vectorstore.persist()
+            print(f"Processed batch {i//max_batch_size + 1} of {(len(splits)-1)//max_batch_size + 1}")
         
         # Update indexing status
         db = await get_database()
