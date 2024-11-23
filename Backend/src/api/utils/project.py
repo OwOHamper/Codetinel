@@ -1,16 +1,18 @@
 import traceback
-from fastapi import HTTPException, UploadFile, File, Form
+from fastapi import HTTPException, UploadFile, File, Form, BackgroundTasks
 from src.db.mongodb import get_database
 from src.utils.normalizer import normalize_csv
 import pandas as pd
 import json
 from datetime import datetime
 from bson import ObjectId
+from src.AI.index.indexing import index_repository
 
 async def create_project(
     project_name: str = Form(...),
     csv_file: UploadFile = File(...),
-    url: str = Form(...)
+    url: str = Form(...),
+    background_tasks: BackgroundTasks = None
 ):
     try:
         # Read CSV content
@@ -26,14 +28,24 @@ async def create_project(
             "project_name": project_name,
             "url": url,
             "vulnerabilities": normalized_data,
-            "created_at": datetime.utcnow()
+            "created_at": datetime.utcnow(),
+            "indexing_status": "pending"
         }
         
         result = await db.projects.insert_one(project_data)
+        project_id = str(result.inserted_id)
+        
+        # Add background task for indexing
+        if background_tasks:
+            background_tasks.add_task(
+                index_repository,
+                project_id=project_id,
+                repo_url=url
+            )
         
         return {
-            "message": "Project created successfully",
-            "project_id": str(result.inserted_id)
+            "message": "Project created successfully, indexing started",
+            "project_id": project_id
         }
         
     except Exception as e:
