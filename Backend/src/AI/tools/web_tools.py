@@ -16,8 +16,8 @@ async def web_request(
 ) -> Dict[str, Any]:
     """Make HTTP requests to the target web application"""
     # Get the actual values from the Field objects
-    headers = {} if headers is None else headers.default
-    data = {} if data is None else data.default
+    headers = {} if headers is None else headers
+    data = {} if data is None else data
     
     print("Using web request tool")
     print(f"Method: {method}")
