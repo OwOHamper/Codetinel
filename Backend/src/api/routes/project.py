@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, BackgroundTasks
+from src.AI.index.indexing import index_repository
 from src.db.mongodb import get_database
 from datetime import datetime
 from bson import ObjectId
@@ -17,9 +18,10 @@ async def create_project_route(
     background_tasks: BackgroundTasks,
     project_name: str = Form(...),
     csv_file: UploadFile = File(...),
-    url: str = Form(...)
+    url: str = Form(...),
+    deployment_url: str = Form(...)
 ):
-    return await create_project(project_name, csv_file, url, background_tasks)
+    return await create_project(project_name, csv_file, url, deployment_url, background_tasks)
 
 @router.get("/indexing-status/{project_id}")
 async def get_indexing_status(project_id: str):
@@ -87,6 +89,44 @@ async def get_collection_info(project_id: str):
             "collection_name": collection.name,
             "count": collection.count(),
             "metadata": collection.metadata
+        }
+        
+    except Exception as e:
+        print(traceback.format_exc())
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/retry-indexing/{project_id}")
+async def retry_indexing(project_id: str, background_tasks: BackgroundTasks):
+    """Retry indexing for a failed project"""
+    try:
+        db = await get_database()
+        project = await db.projects.find_one({"_id": ObjectId(project_id)})
+        
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+            
+        if project.get("indexing_status") != "failed":
+            raise HTTPException(
+                status_code=400, 
+                detail="Can only retry indexing for failed projects"
+            )
+            
+        # Reset indexing status to pending
+        await db.projects.update_one(
+            {"_id": ObjectId(project_id)},
+            {"$set": {"indexing_status": "pending"}}
+        )
+        
+        # Add background task for indexing
+        background_tasks.add_task(
+            index_repository,
+            project_id=project_id,
+            repo_url=project["url"]
+        )
+        
+        return {
+            "message": "Indexing retry started",
+            "project_id": project_id
         }
         
     except Exception as e:

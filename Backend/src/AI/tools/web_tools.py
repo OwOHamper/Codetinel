@@ -15,16 +15,16 @@ async def web_request(
     base_url: str = Field(..., description="Base URL for the request")
 ) -> Dict[str, Any]:
     """Make HTTP requests to the target web application"""
+    # Get the actual values from the Field objects
+    headers = {} if headers is None else headers.default
+    data = {} if data is None else data.default
+    
     print("Using web request tool")
     print(f"Method: {method}")
     print(f"Path: {path}")
     print(f"Headers: {headers}")
     print(f"Data: {data}")
     print(f"Base URL: {base_url}")
-    
-    # Ensure we're using actual values, not Field objects
-    headers = {} if headers is None else headers
-    data = {} if data is None else data
     
     url = f"{base_url.rstrip('/')}/{path.lstrip('/')}"
     async with aiohttp.ClientSession() as session:
@@ -52,8 +52,7 @@ def create_code_search(project_id: str, persist_directory: str = "./chroma_db"):
     
     @tool
     async def code_search(
-        query: str = Field(..., description="Search query to find relevant code"),
-        k: Optional[int] = Field(default=5, description="Number of results to return")
+        query: str = Field(..., description="Search query to find relevant code")
     ) -> Dict[str, Any]:
         """
         Search through the project's codebase to find relevant code snippets.
@@ -73,10 +72,9 @@ def create_code_search(project_id: str, persist_directory: str = "./chroma_db"):
             )
             
             # Ensure k is a concrete integer
-            num_results = k if k is not None else 5
             
             # Perform similarity search with concrete integer
-            results = vectorstore.similarity_search(query, k=num_results)
+            results = vectorstore.similarity_search(query, k=10)
             
             # Format results
             formatted_results = []
