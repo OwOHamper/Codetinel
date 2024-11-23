@@ -1,0 +1,20 @@
+services:
+  api:
+    ports:
+      - "8000:8000"
+    # Changed command to use fastapi CLI
+    command: python -m fastapi run --app-dir app --app main:app --host 0.0.0.0 --port 8000
+    environment:
+      - ENVIRONMENT=production
+      - MONGODB_URL=mongodb://mongodb:27017
+    restart: always 
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27015:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data: 
