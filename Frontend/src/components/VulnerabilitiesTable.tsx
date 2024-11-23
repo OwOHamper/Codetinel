@@ -48,29 +48,29 @@ export default function VulnerabilitiesTable({ data }: TableProps) {
     <Table className="border">
       <TableHeader className="top-0 sticky">
         <TableRow>
-          <TableHead className="text-center">
+          <TableHead >Name</TableHead>
+          <TableHead>Severity</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>
             <Checkbox
               checked={isAllSelected}
               onCheckedChange={handleSelectAll}
             />
           </TableHead>
-          <TableHead className="text-center">Name</TableHead>
-          <TableHead className="text-center">Severity</TableHead>
-          <TableHead className="text-center">Status</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {data.map((row, index) => (
-          <TableRow className="text-center" key={row.name}>
-            <TableCell>
+          <TableRow key={row.name}>
+            <TableCell className="w-1/2">{row.name}</TableCell>
+            <TableCell><SeverityDisplay severity={row.severity} /></TableCell>
+            <TableCell>{row.status}</TableCell>
+            <TableCell className="w-1/100">
               <Checkbox
                 checked={selectedRows.has(index)}
                 onCheckedChange={() => handleRowSelection(index)}
               />
             </TableCell>
-            <TableCell>{row.name}</TableCell>
-            <TableCell><SeverityDisplay severity={row.severity} /></TableCell>
-            <TableCell>{row.status}</TableCell>
           </TableRow>
         ))}
       </TableBody>
