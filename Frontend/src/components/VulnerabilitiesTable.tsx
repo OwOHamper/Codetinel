@@ -1,4 +1,5 @@
 import { Table, TableHeader, TableRow, TableHead, TableCell, TableBody } from './ui/table'
+import SeverityDisplay from './SeverityDipslay';
 import React from 'react'
 
 
@@ -15,7 +16,7 @@ interface TableProps {
 export default function VulnerabilitiesTable({ data }: TableProps) {
   return (
     <Table className="border">
-      <TableHeader className="display-sticky">
+      <TableHeader className="top-0 sticky">
         <TableRow>
           <TableHead className="text-center">Name</TableHead>
           <TableHead className="text-center">Severity</TableHead>
@@ -27,7 +28,7 @@ export default function VulnerabilitiesTable({ data }: TableProps) {
         {data.map((row) => (
           <TableRow className="text-center" key={row.name}>
             <TableCell>{row.name}</TableCell>
-            <TableCell>{row.severity}</TableCell>
+            <TableCell><SeverityDisplay severity={row.severity} /></TableCell>
             <TableCell>{row.status}</TableCell>
           </TableRow>
         ))}
