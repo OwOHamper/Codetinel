@@ -24,7 +24,7 @@ export default function StatusDisplay({ status }: StatusProps) {
     }
 
     return (
-        <span className="flex items-center">
+        <span className="flex items-center capitalize">
             <Icon className="mr-1 h-4 w-4" />
             {status}
         </span>
