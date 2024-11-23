@@ -27,7 +27,7 @@ async def store_task_status(task_id: str, status: Dict):
         {"task_id": task_id},
         {"$set": {
             **status,
-            "updated_at": timezone.utc
+            "updated_at": datetime.now(tz=timezone.utc)
         }},
         upsert=True
     )
@@ -50,7 +50,7 @@ async def process_agent_task(task_id: str, message: str, thread_id: str):
             "thread_id": thread_id,
             "status": "processing",
             "message": message,
-            "created_at": timezone.utc
+            "created_at": datetime.now(tz=timezone.utc)
         })
 
         # Process message

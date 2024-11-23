@@ -4,7 +4,7 @@ from src.db.mongodb import get_database
 from src.utils.normalizer import normalize_csv
 import pandas as pd
 import json
-from datetime import datetime
+from datetime import timezone, datetime
 from bson import ObjectId
 from src.AI.index.indexing import index_repository
 
@@ -31,8 +31,8 @@ async def create_project(
             "url": url,
             # "deployment_url": deployment_url,
             "vulnerabilities": normalized_data,
-            "created_at": datetime.utcnow(),
-            "indexing_status": "pending",
+            "created_at": datetime.now(tz=timezone.utc),
+            "indexing_status": "pending"
         }
         
         result = await db.projects.insert_one(project_data)
