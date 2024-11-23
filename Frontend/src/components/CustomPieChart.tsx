@@ -51,7 +51,7 @@ export default function CustomPieChart({ chartConfig, chartData }) {
                                             y={(viewBox.cy || 0) + 24}
                                             className="fill-muted-foreground"
                                         >
-                                            Visitors
+                                            Total errors
                                         </tspan>
                                     </text>
                                 )

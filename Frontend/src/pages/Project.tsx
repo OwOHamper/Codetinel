@@ -26,36 +26,31 @@ const data = [
 ]
 
 const chartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 287, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 190, fill: "var(--color-other)" },
+  { browser: "critical", visitors: 275, fill: "#f87171" },
+  { browser: "high", visitors: 200, fill: "#fb923c" },
+  { browser: "medium", visitors: 287, fill: "#facc15" },
+  { browser: "low", visitors: 173, fill: "#4ade80" },
 ]
 
 const chartConfig = {
   visitors: {
     label: "Visitors",
   },
-  chrome: {
+  critical: {
     label: "Chrome",
-    color: "hsl(var(--chart-1))",
+    color: "#f87171",
   },
-  safari: {
+  high: {
     label: "Safari",
-    color: "hsl(var(--chart-2))",
+    color: "#fb923c",
   },
-  firefox: {
+  medium: {
     label: "Firefox",
-    color: "hsl(var(--chart-3))",
+    color: "#facc15",
   },
-  edge: {
+  low: {
     label: "Edge",
-    color: "hsl(var(--chart-4))",
-  },
-  other: {
-    label: "Other",
-    color: "hsl(var(--chart-5))",
+    color: "#4ade80",
   },
 }
 

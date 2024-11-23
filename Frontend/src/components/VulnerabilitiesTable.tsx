@@ -4,6 +4,7 @@ import StatusDisplay from './StatusDisplay';
 import React from 'react';
 // import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox from ShadCN
 import { Checkbox } from '@/components/ui/checkbox';
+import { useNavigate } from 'react-router-dom';
 
 interface DataRow {
   name: string;
@@ -18,6 +19,7 @@ interface TableProps {
 export default function VulnerabilitiesTable({ data }: TableProps) {
   const [selectedRows, setSelectedRows] = React.useState<Set<number>>(new Set()); // Track selected row indices
   const [selectAll, setSelectAll] = React.useState(false); // Track whether all rows are selected
+  const navigate = useNavigate()
 
   // Toggle all rows
   const handleSelectAll = () => {
@@ -63,7 +65,7 @@ export default function VulnerabilitiesTable({ data }: TableProps) {
       </TableHeader>
       <TableBody>
         {data.map((row, index) => (
-          <TableRow key={row.name}>
+          <TableRow key={row.name} className="cursor-pointer" onClick={() => navigate(`./error/id`)}>
             <TableCell className="w-1/2">{row.name}</TableCell>
             <TableCell>
               <SeverityDisplay severity={row.severity} />
