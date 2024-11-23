@@ -3,36 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react"; // For the chevron icon
-import { useEffect, useRef, useState } from "react";
 
 export default function MultiSelect({ label, options, selected, setSelected }) {
-    const [triggerWidth, setTriggerWidth] = useState(null); // Store trigger width
-    const triggerRef = useRef(null); // Ref for PopoverTrigger
-
-    useEffect(() => {
-        const updateWidth = () => {
-            if (triggerRef.current) {
-                setTriggerWidth(triggerRef.current.offsetWidth);
-            }
-        };
-
-        // Initial update
-        updateWidth();
-
-        // ResizeObserver for dynamic updates
-        const resizeObserver = new ResizeObserver(() => {
-            updateWidth();
-        });
-
-        if (triggerRef.current) {
-            resizeObserver.observe(triggerRef.current);
-        }
-
-        return () => {
-            resizeObserver.disconnect();
-        };
-    }, []);
-
     const toggleOption = (value) => {
         setSelected((prevSelected) =>
             prevSelected.includes(value)
@@ -58,7 +30,6 @@ export default function MultiSelect({ label, options, selected, setSelected }) {
                 {/* Button with Chevron Icon */}
                 <PopoverTrigger asChild>
                     <Button
-                        ref={triggerRef}
                         variant="outline"
                         className={cn(
                             "w-full font-normal justify-between",
@@ -73,10 +44,7 @@ export default function MultiSelect({ label, options, selected, setSelected }) {
                 </PopoverTrigger>
 
                 {/* Dropdown Menu */}
-                <PopoverContent
-                    className="w-64 left-0 p-1"
-                    style={{ width: triggerWidth }}
-                >
+                <PopoverContent className="w-64 left-0 p-1">
                     {options.map((option) => (
                         <div
                             key={option.value}
