@@ -35,7 +35,7 @@ export default function VulnerabilitiesTableFilter() {
                 />
             </div>
 
-            <Button>Test</Button>
+            <Button className="bg-indigo-500 hover:bg-indigo-400">Test</Button>
         </div>
     )
 }
