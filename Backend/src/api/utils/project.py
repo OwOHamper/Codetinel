@@ -1,6 +1,7 @@
+import traceback
 from fastapi import HTTPException, UploadFile, File, Form, BackgroundTasks
 from src.db.mongodb import get_database
-from src.utils.normalizer import DataNormalizer
+from src.utils.normalizer import normalize_csv
 import pandas as pd
 import json
 from datetime import datetime
@@ -19,7 +20,7 @@ async def create_project(
         
         # Convert DataFrame to JSON and normalize keys
         json_data = json.loads(df.to_json(orient='records'))
-        normalized_data = DataNormalizer.normalize_keys(json_data)
+        normalized_data = normalize_csv(json_data)
         
         # Create project document
         db = await get_database()
@@ -48,6 +49,8 @@ async def create_project(
         }
         
     except Exception as e:
+        print(traceback.format_exc())
+        
         raise HTTPException(status_code=400, detail=str(e)) 
 
 async def get_vulnerabilities(project_id: str):
