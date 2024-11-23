@@ -1,6 +1,5 @@
 import VulnerabilitiesTable from '@/components/VulnerabilitiesTable'
 import VulnerabilitiesTableFilter from '@/components/VulnerabilitiesTableFilter'
-import React from 'react'
 
 const data = [
   {
@@ -27,10 +26,14 @@ const data = [
 
 export default function Project() {
   return (
-    <div>
-      Project
+    <main className="max-w-screen-lg mx-auto p-4">
+      <div className="mb-4">
+        <p className="text-xl text-gray-600 font-bold">Project name</p>
+        <h1 className="text-4xl font-black tracking-tight lg:text-5xl">Gigachat</h1>
+      </div>
+
       <VulnerabilitiesTableFilter />
       <VulnerabilitiesTable data={data} />
-    </div>
+    </main>
   )
 }
