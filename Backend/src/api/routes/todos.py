@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from src.db.mongodb import get_database
 from src.models.todo import Todo, TodoCreate
-from datetime import datetime
+from datetime import timezone
 from bson import ObjectId
 
 router = APIRouter()
@@ -10,7 +10,7 @@ router = APIRouter()
 async def create_todo(todo: TodoCreate):
     db = await get_database()
     todo_dict = todo.model_dump()
-    todo_dict["created_at"] = datetime.utcnow()
+    todo_dict["created_at"] = timezone.utc
     result = await db.todos.insert_one(todo_dict)
     todo_dict["_id"] = str(result.inserted_id)
     return Todo(**todo_dict)
