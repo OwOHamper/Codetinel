@@ -1,7 +1,8 @@
 import { Table, TableHeader, TableRow, TableHead, TableCell, TableBody } from './ui/table';
 import SeverityDisplay from './SeverityDipslay';
 import React from 'react';
-import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox from ShadCN
+// import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox from ShadCN
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface DataRow {
   name: string;
@@ -46,7 +47,7 @@ export default function VulnerabilitiesTable({ data }: TableProps) {
 
   return (
     <Table className="border">
-      <TableHeader className="top-0 sticky">
+      <TableHeader className="top-0 sticky bg-gray-200">
         <TableRow>
           <TableHead >Name</TableHead>
           <TableHead>Severity</TableHead>
