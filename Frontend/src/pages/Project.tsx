@@ -35,27 +35,27 @@ const chartData = [
 
 const chartConfig = {
   visitors: {
-      label: "Visitors",
+    label: "Visitors",
   },
   chrome: {
-      label: "Chrome",
-      color: "hsl(var(--chart-1))",
+    label: "Chrome",
+    color: "hsl(var(--chart-1))",
   },
   safari: {
-      label: "Safari",
-      color: "hsl(var(--chart-2))",
+    label: "Safari",
+    color: "hsl(var(--chart-2))",
   },
   firefox: {
-      label: "Firefox",
-      color: "hsl(var(--chart-3))",
+    label: "Firefox",
+    color: "hsl(var(--chart-3))",
   },
   edge: {
-      label: "Edge",
-      color: "hsl(var(--chart-4))",
+    label: "Edge",
+    color: "hsl(var(--chart-4))",
   },
   other: {
-      label: "Other",
-      color: "hsl(var(--chart-5))",
+    label: "Other",
+    color: "hsl(var(--chart-5))",
   },
 }
 
@@ -68,7 +68,9 @@ export default function Project() {
           <h1 className="text-4xl font-black tracking-tight lg:text-5xl">Gigachat</h1>
         </div>
 
-        <CustomPieChart chartData={chartData} chartConfig={chartConfig} />
+        <div className="block">
+          <CustomPieChart chartData={chartData} chartConfig={chartConfig} />
+        </div>
       </div>
 
       <VulnerabilitiesTableFilter />
