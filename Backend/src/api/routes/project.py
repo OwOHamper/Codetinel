@@ -5,37 +5,12 @@ from datetime import datetime
 from bson import ObjectId
 import pandas as pd
 import json
+from src.utils.normalizer import DataNormalizer
+from src.api.utils.project import get_vulnerabilities, create_project
 
 router = APIRouter()
 
 @router.post("/create")
-async def create_project(
-    project_name: str = Form(...),
-    csv_file: UploadFile = File(...),
-    url: str = Form(...)
-):
-    try:
-        # Read CSV content
-        df = pd.read_csv(csv_file.file)
-        
-        # Convert DataFrame to JSON
-        json_data = json.loads(df.to_json(orient='records'))
-        
-        # Create project document
-        db = await get_database()
-        project_data = {
-            "project_name": project_name,
-            "url": url,
-            "data": json_data,
-            "created_at": datetime.utcnow()
-        }
-        
-        result = await db.projects.insert_one(project_data)
-        
-        return {
-            "message": "Project created successfully",
-            "project_id": str(result.inserted_id)
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e)) 
+async def create_project_route(project_name: str = Form(...), csv_file: UploadFile = File(...), url: str = Form(...)):
+    return await create_project(project_name, csv_file, url)
+
