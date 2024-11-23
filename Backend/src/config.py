@@ -9,6 +9,10 @@ class Settings(BaseSettings):
     MONGODB_URL: str
     ENVIRONMENT: str
     OPENAI_API_KEY: str
+    LANGCHAIN_TRACING_V2: bool
+    LANGCHAIN_ENDPOINT: str
+    LANGCHAIN_API_KEY: str
+    LANGCHAIN_PROJECT: str
 
     class Config:
         env_file = ".env"

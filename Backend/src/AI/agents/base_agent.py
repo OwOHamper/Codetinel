@@ -47,7 +47,7 @@ class BaseAgentManager:
     ) -> Dict[str, Any]:
         """Process a message using the agent"""
         # Run the agent
-        response = await self.agent_executor.invoke(
+        response = await self.agent_executor.ainvoke(
             {
                 "input": message, 
                 # **(context or {})

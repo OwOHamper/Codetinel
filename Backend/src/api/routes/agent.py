@@ -1,24 +1,21 @@
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 from typing import Dict, Optional
-import os
-from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
-from langgraph.prebuilt import create_react_agent
-from langchain_core.messages import HumanMessage
+from pydantic import BaseModel
+from src.AI.agents.pentest_agent import PentestAgent
+from src.config import settings
+from datetime import datetime, timezone
 from uuid import uuid4
 from src.db.mongodb import get_database
-from datetime import datetime, timezone
-
-from src.AI.tools.custom_tool import CustomSearchTool
-from src.AI.agents.base_agent import AgentManager
-from src.config import settings
-
-load_dotenv()
+import traceback
 
 router = APIRouter()
 
-# Initialize the agent manager
-agent_manager = AgentManager(openai_api_key=settings.OPENAI_API_KEY)
+class VulnerabilityTestRequest(BaseModel):
+    project_id: str
+    vulnerability_type: str
+    endpoint: str
+    additional_context: str = None
+    file_context: str = None
 
 async def store_task_status(task_id: str, status: Dict):
     """Store task status in MongoDB"""
@@ -32,29 +29,42 @@ async def store_task_status(task_id: str, status: Dict):
         upsert=True
     )
 
-async def get_stored_task_status(task_id: str) -> Dict:
-    """Retrieve task status from MongoDB"""
-    db = await get_database()
-    task = await db.agent_tasks.find_one({"task_id": task_id})
-    if task:
-        task["_id"] = str(task["_id"])
-        return task
-    return {"status": "not_found"}
-
-async def process_agent_task(task_id: str, message: str, thread_id: str):
-    """Process agent task and store results in MongoDB"""
+async def process_pentest_task(
+    task_id: str,
+    project_id: str,
+    vulnerability_type: str,
+    endpoint: str,
+    additional_context: str = None,
+    file_context: str = None
+):
+    """Process pentest task and store results"""
     try:
+        # Initialize pentest agent with the provided project_id
+        pentest_agent = PentestAgent(
+            openai_api_key=settings.OPENAI_API_KEY,
+            project_id=project_id,
+            target_url="http://localhost:3000",  # Configure this in settings
+            model_name="gpt-4",
+            temperature=0
+        )
+        
         # Update initial status
         await store_task_status(task_id, {
             "task_id": task_id,
-            "thread_id": thread_id,
             "status": "processing",
-            "message": message,
+            "project_id": project_id,
+            "vulnerability_type": vulnerability_type,
+            "endpoint": endpoint,
             "created_at": datetime.now(tz=timezone.utc)
         })
 
-        # Process message
-        response = await agent_manager.process_message(message, thread_id)
+        # Process vulnerability test
+        response = await pentest_agent.test_vulnerability(
+            vulnerability_type=vulnerability_type,
+            endpoint=endpoint,
+            additional_context=additional_context,
+            file_context=file_context
+        )
         
         # Store success result
         await store_task_status(task_id, {
@@ -63,69 +73,49 @@ async def process_agent_task(task_id: str, message: str, thread_id: str):
         })
 
     except Exception as e:
+        print(f"Error in pentest task: {str(e)}")
+        print(traceback.format_exc())
         # Store error result
         await store_task_status(task_id, {
             "status": "failed",
             "error": str(e)
         })
 
-@router.post("/process")
-async def process_message(
-    message: str,
+@router.post("/pentest/test")
+async def test_vulnerability(
+    request: VulnerabilityTestRequest,
     background_tasks: BackgroundTasks,
-    thread_id: Optional[str] = None
 ) -> Dict:
     """
-    Start a new agent task in the background
+    Start a new pentest task
     """
-    # Generate IDs
     task_id = str(uuid4())
-    thread_id = thread_id or str(uuid4())
     
     # Add task to background tasks
     background_tasks.add_task(
-        process_agent_task,
+        process_pentest_task,
         task_id=task_id,
-        message=message,
-        thread_id=thread_id
+        project_id=request.project_id,
+        vulnerability_type=request.vulnerability_type,
+        endpoint=request.endpoint,
+        additional_context=request.additional_context,
+        file_context=request.file_context
     )
     
     return {
         "task_id": task_id,
-        "thread_id": thread_id,
-        "status": "processing"
+        "status": "processing",
+        "message": f"Testing {request.vulnerability_type} vulnerability on {request.endpoint}"
     }
 
-@router.get("/status/{task_id}")
-async def get_task_status(task_id: str) -> Dict:
-    """
-    Get the status of an agent task
-    """
-    task = await get_stored_task_status(task_id)
-    if task["status"] == "not_found":
-        raise HTTPException(status_code=404, detail="Task not found")
-    return task
-
-@router.get("/thread/{thread_id}")
-async def get_thread_history(thread_id: str) -> Dict:
-    """
-    Get all tasks and responses for a specific thread
-    """
+@router.get("/pentest/status/{task_id}")
+async def get_pentest_status(task_id: str) -> Dict:
+    """Get the status of a pentest task"""
     db = await get_database()
-    cursor = db.agent_tasks.find(
-        {"thread_id": thread_id},
-        sort=[("created_at", 1)]
-    )
+    task = await db.agent_tasks.find_one({"task_id": task_id})
     
-    history = []
-    async for task in cursor:
-        task["_id"] = str(task["_id"])
-        history.append(task)
-    
-    if not history:
-        raise HTTPException(status_code=404, detail="Thread not found")
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
         
-    return {
-        "thread_id": thread_id,
-        "history": history
-    }
+    task["_id"] = str(task["_id"])
+    return task
