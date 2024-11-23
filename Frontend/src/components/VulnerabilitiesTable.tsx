@@ -14,8 +14,8 @@ interface TableProps {
 
 export default function VulnerabilitiesTable({ data }: TableProps) {
   return (
-    <Table>
-      <TableHeader>
+    <Table className="border">
+      <TableHeader className="display-sticky">
         <TableRow>
           <TableHead className="text-center">Name</TableHead>
           <TableHead className="text-center">Severity</TableHead>
