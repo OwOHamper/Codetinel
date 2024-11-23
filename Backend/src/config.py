@@ -8,6 +8,7 @@ load_dotenv()
 class Settings(BaseSettings):
     MONGODB_URL: str
     ENVIRONMENT: str
+    OPENAI_API_KEY: str
 
     class Config:
         env_file = ".env"

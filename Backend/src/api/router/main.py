@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from src.api.routes import todos, project
+from src.api.routes import project
 
 api_router = APIRouter()
 
