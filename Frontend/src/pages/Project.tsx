@@ -4,7 +4,7 @@ import VulnerabilitiesTableFilter from '@/components/VulnerabilitiesTableFilter'
 const data = [
   {
     name: "CWE-22",
-    severity: "medium",
+    severity: "high",
     status: "detected",
   },
   {
@@ -14,7 +14,7 @@ const data = [
   },
   {
     name: "CWE-22",
-    severity: "medium",
+    severity: "critical",
     status: "detected",
   },
   {
