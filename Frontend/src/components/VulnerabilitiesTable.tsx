@@ -1,6 +1,6 @@
-import { Table, TableHeader, TableRow, TableHead, TableCell, TableBody } from './ui/table';
-import SeverityDisplay from './SeverityDipslay';
-import StatusDisplay from './StatusDisplay';
+import { Table, TableHeader, TableRow, TableHead, TableCell, TableBody } from '@/components/ui/table';
+import SeverityDisplay from '@/components/SeverityDipslay';
+import StatusDisplay from '@/components/StatusDisplay';
 import React from 'react';
 // import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox from ShadCN
 import { Checkbox } from '@/components/ui/checkbox';
@@ -64,7 +64,7 @@ export default function VulnerabilitiesTable({ data }: TableProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.map((row, index) => (
+        {Object.entries(data).map(([id, row]) => (
           <TableRow key={row.name} className="cursor-pointer" onClick={() => navigate(`./error/id`)}>
             <TableCell className="w-1/2">{row.name}</TableCell>
             <TableCell>
@@ -75,8 +75,8 @@ export default function VulnerabilitiesTable({ data }: TableProps) {
             </TableCell>
             <TableCell className="w-1/100">
               <Checkbox
-                checked={selectedRows.has(index)}
-                onCheckedChange={() => handleRowSelection(index)}
+                checked={selectedRows.has(id)}
+                onCheckedChange={() => handleRowSelection(id)}
               />
             </TableCell>
           </TableRow>

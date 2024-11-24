@@ -14,7 +14,7 @@ export default function Projects() {
           <Plus className="w-12 h-12 text-indigo-600" />
           {/* <span className="text-indigo-600 text-2xl">+</span> */}
         </Link>
-        <Link to="/projects/id" className="border-2 border-indigo-600 h-44 rounded-xl flex items-center justify-center hover:bg-indigo-50">
+        <Link to="/projects/id" className="border-2 border-indigo-600 h-44 rounded-xl flex items-center justify-center hover:bg-indigo-50 relative">
           <span className="text-indigo-600 text-2xl">Gigachat</span>
         </Link>
         <Link to="/projects/id" className="border-2 border-indigo-600 h-44 rounded-xl flex items-center justify-center hover:bg-indigo-50">

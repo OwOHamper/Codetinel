@@ -6,29 +6,6 @@ import { useQuery } from 'react-query'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 
-const data = [
-  {
-    name: "CWE-22",
-    severity: "high",
-    status: "detected",
-  },
-  {
-    name: "CWE-22",
-    severity: "medium",
-    status: "detected",
-  },
-  {
-    name: "CWE-22",
-    severity: "critical",
-    status: "detected",
-  },
-  {
-    name: "CWE-22",
-    severity: "medium",
-    status: "detected",
-  },
-]
-
 const chartData = [
   { browser: "critical", visitors: 275, fill: "#f87171" },
   { browser: "high", visitors: 200, fill: "#fb923c" },
@@ -58,20 +35,34 @@ const chartConfig = {
   },
 }
 
+const data = [
+  {
+    name: "CVE-2024-1234",
+    severity: "critical",
+    status: "detected",
+  }
+]
+
+
 export default function Project() {
   const { projectId } = useParams()
 
   const fetchProject = async () => {
-    const response = await axios.get(`${import.meta.env.BASE_URL}/`)
-    return response.data
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/vulnerabilities/get-vulnerabilities/${projectId}`)
+      console.log(response.data)
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
   }
 
-  const { status } = useQuery({
+  const { data, status } = useQuery({
+    queryKey: ['project', projectId],
     queryFn: fetchProject,
-    queryKey: ["project", projectId],
   })
 
-  return status === "pending" ? (
+  return status === "loading" ? (
     <div className="h-screen flex justify-center items-center">
       <Loader2
         className='my-28 h-16 w-16 text-primary/60 animate-spin'
@@ -81,12 +72,12 @@ export default function Project() {
     <div className="h-screen flex justify-center items-center">
       <p>An error has occured!</p>
     </div>
-  ) : (
+  ) : data ? (
     <main className="max-w-screen-lg mx-auto p-4">
       <div className="grid items-center grid-cols-2 mb-4">
         <div>
           <p className="text-xl text-indigo-600 font-bold">Project name</p>
-          <h1 className="text-4xl text-indigo-800 font-black tracking-tight lg:text-5xl">Gigachat</h1>
+          <h1 className="text-4xl text-indigo-800 font-black tracking-tight lg:text-5xl"></h1>
         </div>
 
         <div className="block">
@@ -97,5 +88,5 @@ export default function Project() {
       <VulnerabilitiesTableFilter />
       <VulnerabilitiesTable data={data} />
     </main>
-  )
+  ) : null
 }

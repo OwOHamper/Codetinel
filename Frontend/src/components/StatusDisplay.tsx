@@ -6,7 +6,7 @@ interface StatusProps {
     status: "detected" | "queued" | "pending" | "finished"; // Define the statuses
 }
 
-export default function StatusDisplay({ status }: StatusProps) {
+function StatusDisplay({ status }: StatusProps) {
     let Icon;
     switch (status) {
         case "detected":
@@ -24,9 +24,11 @@ export default function StatusDisplay({ status }: StatusProps) {
     }
 
     return (
-        <span className="flex items-center capitalize">
+        <div className="flex items-center capitalize">
             <Icon className="mr-1 h-4 w-4" />
             {status}
-        </span>
+        </div>
     )
 }
+
+export default StatusDisplay
