@@ -67,8 +67,17 @@ def create_web_request(base_url: str):
                     response_headers = dict(response.headers)
                     try:
                         response_data = await response.json()
+                        # Limit response data size (e.g., to 100KB)
+                        if isinstance(response_data, str) and len(response_data) > 80000:
+                            response_data = response_data[:80000] + "... (truncated)"
+                        elif isinstance(response_data, dict):
+                            response_data_str = str(response_data)
+                            if len(response_data_str) > 80000:
+                                response_data = {"warning": "Response was truncated due to size", "truncated_data": str(response_data)[:100000] + "..."}
                     except:
                         response_data = await response.text()
+                        if len(response_data) > 80000:
+                            response_data = response_data[:80000] + "... (truncated)"
                     
                     return {
                         "status": status,
