@@ -14,14 +14,27 @@ def create_web_request(base_url: str):
         method: str = Field(..., description="HTTP method (GET, POST, etc.)"),
         path: str = Field(..., description="URL path to request"),
         headers: Optional[Dict[str, str]] = Field(default=None, description="Request headers"),
-        data: Optional[Dict[str, Any]] = Field(default=None, description="Request body data")
+        data: Optional[Any] = Field(default=None, description="Request body data (dictionary or JSON string)")
     ) -> Dict[str, Any]:
         """Make HTTP requests to the target web application"""
         # Get the actual values from the Field objects
         method = method if isinstance(method, str) else method.default
         path = path if isinstance(path, str) else path.default
         headers = headers.default if hasattr(headers, 'default') else headers
-        data = data.default if hasattr(data, 'default') else data
+        
+        # Handle data that might be a string representation of JSON
+        if isinstance(data, str):
+            try:
+                import json
+                data = json.loads(data)
+            except json.JSONDecodeError:
+                return {
+                    "error": f"Invalid JSON data: {data}",
+                    "status": 400,
+                    "data": None
+                }
+        else:
+            data = data.default if hasattr(data, 'default') else data
 
         # Validate and normalize method
         method = method.upper()
