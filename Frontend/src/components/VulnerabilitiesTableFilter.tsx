@@ -6,28 +6,31 @@ import axios from "axios"
 import { useQueryClient } from "react-query"
 
 interface VulnerabilitiesTableFilterProps {
-  severity: string[]
-  setSeverity: (severity: string[]) => void
-  status: string[]
-  setStatus: (status: string[]) => void
-  selectedVulnerabilities: string[]
-  projectId: string
-  setSelectedVulnerabilities: (vulnerabilities: number[]) => void
+    severity: string[]
+    setSeverity: (severity: string[]) => void
+    status: string[]
+    setStatus: (status: string[]) => void
+    selectedVulnerabilities: string[]
+    projectId: string
+    setSelectedVulnerabilities: (vulnerabilities: number[]) => void
 }
 
 export default function VulnerabilitiesTableFilter({
-  severity,
-  setSeverity,
-  status,
-  setStatus,
-  selectedVulnerabilities,
-  projectId,
-  setSelectedVulnerabilities,
+    severity,
+    setSeverity,
+    status,
+    setStatus,
+    selectedVulnerabilities,
+    projectId,
+    setSelectedVulnerabilities,
 }: VulnerabilitiesTableFilterProps) {
     const queryClient = useQueryClient()
 
     const handleTest = async () => {
         try {
+            // Clear selections after starting the tests
+            setSelectedVulnerabilities([]);
+
             // Start all tests
             for (const vulnId of selectedVulnerabilities) {
                 await axios.post(`${import.meta.env.VITE_API_URL}/api/agent/pentest/test`, {
@@ -36,8 +39,6 @@ export default function VulnerabilitiesTableFilter({
                 })
             }
 
-            // Clear selections after starting the tests
-            setSelectedVulnerabilities([]);
 
             // Poll for changes every 2 seconds for up to 1 minute
             const pollInterval = 2000 // 2 seconds
@@ -86,7 +87,7 @@ export default function VulnerabilitiesTableFilter({
                 />
             </div>
 
-            <Button 
+            <Button
                 className="bg-indigo-500 hover:bg-indigo-400"
                 onClick={handleTest}
                 disabled={selectedVulnerabilities.length === 0}
