@@ -6,7 +6,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigate } from 'react-router-dom';
 
 interface DataRow {
-  name: string;
+  id: number;
+  cve?: string;
+  cwe?: string;
   severity: string;
   status: string;
 }
@@ -16,36 +18,34 @@ interface TableProps {
 }
 
 export default function VulnerabilitiesTable({ data }: TableProps) {
-  const [selectedRows, setSelectedRows] = React.useState<Set<number>>(new Set()); // Track selected row indices
-  const [selectAll, setSelectAll] = React.useState(false); // Track whether all rows are selected
+  const [selectedRows, setSelectedRows] = React.useState<number[]>([]);
+  const [selectAll, setSelectAll] = React.useState(false);
   const navigate = useNavigate()
 
   // Toggle all rows
   const handleSelectAll = () => {
     if (selectAll) {
-      setSelectedRows(new Set()); // Deselect all
+      setSelectedRows([]);
     } else {
-      const allIndices = new Set(data.map((_, index) => index)); // Select all using indices
-      setSelectedRows(allIndices);
+      const allIds = data.map(item => item.id);
+      setSelectedRows(allIds);
     }
     setSelectAll(!selectAll);
   };
 
   // Toggle single row selection
-  const handleRowSelection = (index: number) => {
-    setSelectedRows((prevSelectedRows) => {
-      const newSelectedRows = new Set(prevSelectedRows);
-      if (newSelectedRows.has(index)) {
-        newSelectedRows.delete(index); // Deselect the row
+  const handleRowSelection = (id: number) => {
+    setSelectedRows(prevSelectedRows => {
+      if (prevSelectedRows.includes(id)) {
+        return prevSelectedRows.filter(rowId => rowId !== id);
       } else {
-        newSelectedRows.add(index); // Select the row
+        return [...prevSelectedRows, id];
       }
-      return newSelectedRows;
     });
   };
 
   // Check if all rows are selected
-  const isAllSelected = selectedRows.size === data.length;
+  const isAllSelected = selectedRows.length === data.length;
 
   return (
     <Table className="border">
@@ -74,7 +74,7 @@ export default function VulnerabilitiesTable({ data }: TableProps) {
             </TableCell>
             <TableCell className="w-1/100" onClick={(e) => e.stopPropagation()}>
               <Checkbox
-                checked={selectedRows.has(item.id)}
+                checked={selectedRows.includes(item.id)}
                 onCheckedChange={() => handleRowSelection(item.id)}
               />
             </TableCell>
