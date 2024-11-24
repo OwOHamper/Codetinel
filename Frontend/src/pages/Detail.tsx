@@ -1,10 +1,11 @@
-import { Loader2, TriangleAlert } from 'lucide-react'
-import { useParams } from 'react-router-dom'
+import { ArrowLeft, Loader2, TriangleAlert } from 'lucide-react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery } from 'react-query'
 import axios from 'axios'
 
 export default function Detail() {
   const { projectId, errorId } = useParams()
+  const navigate = useNavigate()
 
   const fetchVulnerability = async () => {
     const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/vulnerabilities/get-vulnerability/${projectId}/${errorId}`)
@@ -37,6 +38,15 @@ export default function Detail() {
   return (
     <main className="max-w-screen-lg mx-auto p-4">
       <div className="grid items-center mb-8">
+        <div className="mb-4 flex items-center">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Back</span>
+          </button>
+        </div>
         <p className="text-xl text-gray-600 font-bold">{vulnerability?.cve || vulnerability?.cwe}</p>
         <h1 className="text-4xl font-black tracking-tight">{vulnerability?.vulnerability}</h1>
       </div>
@@ -48,39 +58,35 @@ export default function Detail() {
       <p className="mb-4">{vulnerability?.details.split("\\n")}</p>
 
 
-      {vulnerability?.last_test ? (
-        vulnerability?.last_test.result ? (
-          <>
-            <div className="mb-4">
-              <p className="font-bold text-2xl text-indigo-600 mb-4">Suggestion</p>
-              <p>{vulnerability.last_test.result.suggestion}</p>
+      {vulnerability?.last_test && (
+        <>
+          <div className="mb-4">
+            <p className="font-bold text-2xl text-indigo-600 mb-4">Suggestion</p>
+            <p>{vulnerability.last_test.result.suggestion}</p>
+          </div>
+          <div>
+            <p className="font-bold text-2xl text-indigo-600 mb-4">Code overview</p>
+            <p className="mb-2">Vulnerabilty found on <b>line {vulnerability.last_test.result.line_number}</b></p>
+            <div className="border border-black rounded-lg p-4 bg-gray-50">
+              <pre className="whitespace-pre-wrap font-mono text-sm">
+                {vulnerability.last_test.result.file_context.split("\n").map((line, idx) => {
+                  const lineNumber = vulnerability.last_test.result.file_context.split("\n")[idx].split("|")[0].trim(); // Extract the line number
+                  return (
+                    <div
+                      key={lineNumber}
+                      className={parseInt(lineNumber) === vulnerability.last_test.result.line_number ? "bg-red-200" : ""}
+                    >
+                      {line}
+                    </div>
+                  );
+                })}
+              </pre>
             </div>
-            <div>
-              <p className="font-bold text-2xl text-indigo-600 mb-4">Code overview</p>
-              <p className="mb-2">Vulnerabilty found on <b>line {vulnerability.last_test.result.line_number}</b></p>
-              <div className="border border-black rounded-lg p-4 bg-gray-50">
-                <pre className="whitespace-pre-wrap font-mono text-sm">
-                  {vulnerability.last_test.result.file_context.split("\n").map((line, idx) => {
-                    const lineNumber = vulnerability.last_test.result.file_context.split("\n")[idx].split("|")[0].trim(); // Extract the line number
-                    return (
-                      <div
-                        key={lineNumber}
-                        className={parseInt(lineNumber) === vulnerability.last_test.result.line_number ? "bg-red-200" : ""}
-                      >
-                        {line}
-                      </div>
-                    );
-                  })}
-                </pre>
-              </div>
-            </div>
-          </>
-        ) : (
-          <p>The AI agent couldn't exploit the vulnerabilty on your site</p>
-        )
-      ) : (
-        <p>Vulnerability not tested yet</p>
-      )}
+          </div>
+        </>
+      ) || (
+          <p>Vulnerability not tested yet</p>
+        )}
       {/* <div className="border border-black rounded-lg p-4"> */}
 
       {/* </div> */}
