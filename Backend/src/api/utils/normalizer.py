@@ -42,7 +42,7 @@ def get_file(file_context):
 def normalize_csv(csv_data):
         output = {
             (uid := str(uuid.uuid4())): {
-                **{key.replace(' ', '_').lower(): value for key, value in item.items()},
+                **{key.replace(' ', '_').replace('\n', '').lower(): value for key, value in item.items()},
                 "id": uid,
                 "status": "not_started",
                 "file_key": get_file(item.get("Location"))
