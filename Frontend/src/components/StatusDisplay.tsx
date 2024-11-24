@@ -1,21 +1,18 @@
-import { TriangleAlert, CircleCheck, Clock3, FlaskConical } from "lucide-react";
+import { TriangleAlert, CircleCheck, Clock3, CircleX } from "lucide-react";
 
 
 interface StatusProps {
-    status: "detected" | "queued" | "pending" | "completed" | "not_started"; // Define the statuses
+    status: "failed" | "processing" | "completed" | "not_started"; // Define the statuses
 }
 
 function StatusDisplay({ status }: StatusProps) {
     let Icon;
     switch (status) {
-        case "detected":
-            Icon = TriangleAlert;
+        case "failed":
+            Icon = CircleX;
             break;
-        case "queued":
+        case "processing":
             Icon = Clock3;
-            break;
-        case "pending":
-            Icon = FlaskConical;
             break;
         case "completed":
             Icon = CircleCheck;

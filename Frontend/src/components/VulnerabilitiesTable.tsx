@@ -17,8 +17,7 @@ interface TableProps {
   data: DataRow[];
 }
 
-export default function VulnerabilitiesTable({ data }: TableProps) {
-  const [selectedRows, setSelectedRows] = React.useState<number[]>([]);
+export default function VulnerabilitiesTable({ data, selectedRows, setSelectedRows }: TableProps) {
   const [selectAll, setSelectAll] = React.useState(false);
   const navigate = useNavigate()
 

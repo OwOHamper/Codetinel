@@ -33,6 +33,7 @@ export default function Project() {
   const { projectId } = useParams()
   const [severity, setSeverity] = useState<string[]>([])
   const [status, setStatus] = useState<string[]>([])
+  const [selectedRows, setSelectedRows] = useState<string[]>([])
 
   const fetchProject = async () => {
     try {
@@ -108,8 +109,14 @@ export default function Project() {
         setSeverity={setSeverity}
         status={status}
         setStatus={setStatus}
+        selectedVulnerabilities={selectedRows}
+        projectId={projectId!}
       />
-      <VulnerabilitiesTable data={filteredData} />
+      <VulnerabilitiesTable 
+        data={filteredData} 
+        selectedRows={selectedRows}
+        setSelectedRows={setSelectedRows}
+      />
     </main>
   ) : null
 }
