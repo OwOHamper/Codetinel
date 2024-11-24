@@ -6,7 +6,7 @@ from bson import ObjectId
 import pandas as pd
 import json
 from src.utils.normalizer import normalize_csv
-from src.api.utils.project import create_project
+from src.api.utils.project import create_project, delete_project
 import traceback
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
@@ -22,6 +22,10 @@ async def create_project_route(
     deployment_url: str = Form(...)
 ):
     return await create_project(project_name, csv_file, url, deployment_url, background_tasks)
+
+@router.post("/delete")
+async def delete_project_route(project_id: str = Form(...)):
+    return await delete_project(project_id)
 
 @router.get("/indexing-status/{project_id}")
 async def get_indexing_status(project_id: str):
@@ -133,3 +137,14 @@ async def retry_indexing(project_id: str, background_tasks: BackgroundTasks):
         print(traceback.format_exc())
         raise HTTPException(status_code=400, detail=str(e))
 
+@router.get("/get_all_projects")
+async def get_all_projects():
+    """Get all projects from the database"""
+    try:
+        db = await get_database()
+        projects = await db.projects.find().to_list(length=None)
+        for project in projects:
+            project["_id"] = str(project["_id"])
+        return projects
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching projects: {str(e)}")
