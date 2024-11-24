@@ -44,8 +44,9 @@ export default function CreateProject() {
   const isFormValid = title && deployUrl && file && !isLoading
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-screen-lg mx-auto p-4">
-      <div className="mt-20">
+    <main className="max-w-screen-lg mx-auto p-4 h-screen flex justify-center items-center">
+    <form onSubmit={handleSubmit} className="w-full">
+      <div className="mb-20">
         <h1 className="text-4xl font-black tracking-tight lg:text-5xl text-indigo-600">Title</h1>
         <div className="relative">
           <Input
@@ -103,6 +104,7 @@ export default function CreateProject() {
         {isLoading ? "Creating..." : "Create"}
       </Button>
     </form>
+    </main>
   )
 }
 
