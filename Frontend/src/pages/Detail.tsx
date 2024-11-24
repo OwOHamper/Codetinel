@@ -1,20 +1,51 @@
-import { TriangleAlert } from 'lucide-react'
+import { Loader2, TriangleAlert } from 'lucide-react'
+import { useParams } from 'react-router-dom'
+import { useQuery } from 'react-query'
+import axios from 'axios'
 
 export default function Detail() {
+  const { projectId, errorId } = useParams()
+
+  const fetchVulnerability = async () => {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/vulnerabilities/get-vulnerability/${projectId}/${errorId}`)
+    return response.data
+  }
+
+  const { data: vulnerability, status } = useQuery({
+    queryKey: ['vulnerability', projectId, errorId],
+    queryFn: fetchVulnerability,
+  })
+
+  if (status === 'loading') {
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <Loader2 className='my-28 h-16 w-16 text-primary/60 animate-spin' />
+      </div>
+    )
+  }
+
+  if (status === 'error') {
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <p>An error has occurred!</p>
+      </div>
+    )
+  }
+
   return (
     <main className="max-w-screen-lg mx-auto p-4">
       <div className="grid items-center mb-8">
-        <p className="text-xl text-gray-600 font-bold">CWE-22</p>
-        <h1 className="text-4xl font-black tracking-tight">Improper limitation of a pathname to a restricted directory ('Path Traversal')</h1>
+        <p className="text-xl text-gray-600 font-bold">{vulnerability?.cve || vulnerability?.cwe}</p>
+        <h1 className="text-4xl font-black tracking-tight">{vulnerability?.vulnerability}</h1>
       </div>
 
       <div className="flex items-center gap-2 mb-4">
         <TriangleAlert className="bg-indigo-600 text-white rounded-lg p-2 w-10 h-10" />
-        <p className="font-bold text-2xl text-indigo-600">Summary of the Vulnerabilitie</p>
+        <p className="font-bold text-2xl text-indigo-600">Summary of the Vulnerability</p>
       </div>
-      <p className="mb-8">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorum culpa cumque quam nesciunt magnam fuga id labore quas aliquid veniam possimus, quis molestias ea architecto ad incidunt illo qui. Praesentium.</p>
+      <p className="mb-8">{vulnerability?.details}</p>
 
-        <p className="font-bold text-2xl text-indigo-600 mb-4">Step by step overview</p>
+      <p className="font-bold text-2xl text-indigo-600 mb-4">Step by step overview</p>
       <div className="border border-black rounded-lg p-4">
 
       </div>

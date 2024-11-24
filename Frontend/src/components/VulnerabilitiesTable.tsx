@@ -2,7 +2,6 @@ import { Table, TableHeader, TableRow, TableHead, TableCell, TableBody } from '@
 import SeverityDisplay from '@/components/SeverityDipslay';
 import StatusDisplay from '@/components/StatusDisplay';
 import React from 'react';
-// import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox from ShadCN
 import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigate } from 'react-router-dom';
 
@@ -64,19 +63,19 @@ export default function VulnerabilitiesTable({ data }: TableProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {Object.entries(data).map(([id, row]) => (
-          <TableRow key={row.name} className="cursor-pointer" onClick={() => navigate(`./error/id`)}>
-            <TableCell className="w-1/2">{row.cve || row.cwe}</TableCell>
+        {data.map((item) => (
+          <TableRow key={item.id} className="cursor-pointer" onClick={() => navigate(`./error/${item.id}`)}>
+            <TableCell className="w-1/2">{item.cve || item.cwe}</TableCell>
             <TableCell>
-              <SeverityDisplay severity={row.severity} />
+              <SeverityDisplay severity={item.severity} />
             </TableCell>
             <TableCell>
-              <StatusDisplay status={row.status} />
+              <StatusDisplay status={item.status} />
             </TableCell>
             <TableCell className="w-1/100" onClick={(e) => e.stopPropagation()}>
               <Checkbox
-                checked={selectedRows.has(parseInt(id))}
-                onCheckedChange={() => handleRowSelection(parseInt(id))}
+                checked={selectedRows.has(item.id)}
+                onCheckedChange={() => handleRowSelection(item.id)}
               />
             </TableCell>
           </TableRow>
