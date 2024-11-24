@@ -36,7 +36,7 @@ export default function Project() {
 
   const fetchProject = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/vulnerabilities/get-vulnerabilities/${projectId}`)
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/project/get_project/${projectId}`)
       return response.data
     } catch (error) {
       console.error(error)
@@ -48,7 +48,7 @@ export default function Project() {
     queryFn: fetchProject,
   })
 
-  const filteredData = data ?  Object.values(data).filter((item: any) => {
+  const filteredData = data ? Object.values(data.vulnerabilities).filter((item: any) => {
     const severityMatch = severity.length === 0 || severity.includes(item.severity)
     const statusMatch = status.length === 0 || status.includes(item.status)
     return severityMatch && statusMatch
@@ -92,12 +92,12 @@ export default function Project() {
       <div className="grid items-center grid-cols-2 mb-4">
         <div>
           <p className="text-xl text-indigo-600 font-bold">Project name</p>
-          <h1 className="text-4xl text-indigo-800 font-black tracking-tight lg:text-5xl"></h1>
+          <h1 className="text-4xl text-indigo-800 font-black tracking-tight lg:text-5xl">{data.project_name}</h1>
         </div>
 
         <div className="block">
           <CustomPieChart 
-            chartData={getChartData(Object.values(data))} 
+            chartData={getChartData(Object.values(data.vulnerabilities))} 
             chartConfig={chartConfig} 
           />
         </div>
