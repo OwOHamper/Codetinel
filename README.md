@@ -16,6 +16,10 @@ What inspired us was the actual process of developing this product. With our wal
 ## What it does
 Our product is a web tool utilizing AI agents. You upload your source code, the program will determine whether the vulnerabilities in your code are truly exploitable or not. Then you can visualize a detailed overview of the it (in what part of the code the error occurred + recommendations on how to fix it) 
 
+
+![Vulnerability Overview](assets/vulnerability-overview.png)
+![Code Analysis](assets/code-analysis.png)
+
 ## How we built it
 
 Tools used: Design: Canva
