@@ -1,6 +1,10 @@
 import CustomPieChart from '@/components/CustomPieChart'
 import VulnerabilitiesTable from '@/components/VulnerabilitiesTable'
 import VulnerabilitiesTableFilter from '@/components/VulnerabilitiesTableFilter'
+import { Loader2 } from 'lucide-react'
+import { useQuery } from 'react-query'
+import { useParams } from 'react-router-dom'
+import axios from 'axios'
 
 const data = [
   {
@@ -55,12 +59,34 @@ const chartConfig = {
 }
 
 export default function Project() {
-  return (
+  const { projectId } = useParams()
+
+  const fetchProject = async () => {
+    const response = await axios.get(`${import.meta.env.BASE_URL}/`)
+    return response.data
+  }
+
+  const { status } = useQuery({
+    queryFn: fetchProject,
+    queryKey: ["project", projectId],
+  })
+
+  return status === "pending" ? (
+    <div className="h-screen flex justify-center items-center">
+      <Loader2
+        className='my-28 h-16 w-16 text-primary/60 animate-spin'
+      />
+    </div>
+  ) : status === "error" ? (
+    <div className="h-screen flex justify-center items-center">
+      <p>An error has occured!</p>
+    </div>
+  ) : (
     <main className="max-w-screen-lg mx-auto p-4">
       <div className="grid items-center grid-cols-2 mb-4">
         <div>
-          <p className="text-xl text-gray-600 font-bold">Project name</p>
-          <h1 className="text-4xl font-black tracking-tight lg:text-5xl">Gigachat</h1>
+          <p className="text-xl text-indigo-600 font-bold">Project name</p>
+          <h1 className="text-4xl text-indigo-800 font-black tracking-tight lg:text-5xl">Gigachat</h1>
         </div>
 
         <div className="block">
