@@ -10,6 +10,8 @@ activate it
 install requirements if not install
 pytohn -m pip install -r ./requirements.txt
 
+// you may need to resolve some depencey issue, removce them, istall some microsoft build tools... (sorry)
+
 
 cd datas
 git clone https://github.com/juice-shop/juice-shop
