@@ -15,7 +15,8 @@ import fnmatch
 BASE_REPOS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "data")
 # Map of repository URLs to their local paths
 REPO_PATHS = {
-    "https://github.com/juice-shop/juice-shop": os.path.join(BASE_REPOS_DIR, "juice-shop")
+    "https://github.com/juice-shop/juice-shop": os.path.join(BASE_REPOS_DIR, "juice-shop"),
+    "https://github.com/DiogoMRSilva/websitesVulnerableToSSTI": os.path.join(BASE_REPOS_DIR, "websitesVulnerableToSSTI")
     # Add more repositories as needed
 }
 
