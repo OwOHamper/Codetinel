@@ -201,6 +201,7 @@ async def test_vulnerability(
     file_context = vulnerability.get("location")
     print("File context:", file_context)
     middle_line = None
+    start_line = None
     if file_context and isinstance(file_context, str):
         # Parse the Ruby-style string format
         try:
@@ -246,7 +247,7 @@ async def test_vulnerability(
         vulnerability_type=vulnerability["vulnerability"],
         additional_context=vulnerability.get("details"),
         file_context=file_context,
-        line_number=start_line or None,
+        line_number=middle_line or None,
     )
     
     return {
