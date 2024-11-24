@@ -119,6 +119,7 @@ export default function Project() {
         status={status}
         setStatus={setStatus}
         selectedVulnerabilities={selectedRows}
+        setSelectedVulnerabilities={setSelectedRows}
         projectId={projectId!}
       />
       <VulnerabilitiesTable

@@ -5,6 +5,7 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
+  Navigate,
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from 'react-query';
 
@@ -20,8 +21,10 @@ const queryClient = new QueryClient();
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
+      <img src="/logo.png" alt="logo" className="w-24 h-24 absolute top-0 left-4" />
       <Router>
         <Routes>
+          <Route path="/" element={<Navigate to="/projects" replace />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/new" element={<CreateProject />} />
           <Route path="/projects/:projectId" element={<Project />} />
