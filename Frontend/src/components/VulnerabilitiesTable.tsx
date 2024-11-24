@@ -52,10 +52,12 @@ export default function VulnerabilitiesTable({ data }: TableProps) {
       <TableHeader className="top-0 sticky bg-gray-200">
         <TableRow>
           <TableHead >Name</TableHead>
+          <TableHead>File key</TableHead>
           <TableHead>Severity</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>
             <Checkbox
+              className="mr-2"
               checked={isAllSelected}
               onCheckedChange={handleSelectAll}
             />
@@ -65,15 +67,23 @@ export default function VulnerabilitiesTable({ data }: TableProps) {
       <TableBody>
         {data.map((item) => (
           <TableRow key={item.id} className="cursor-pointer" onClick={() => navigate(`./error/${item.id}`)}>
-            <TableCell className="w-1/2">{item.cve || item.cwe}</TableCell>
+            <TableCell>{item.cve || item.cwe}</TableCell>
+            <TableCell>
+              {item.file_key && (
+                <div className="inline-flex text-xs bg-gray-200 rounded-md px-2 p-1">
+                  {item.file_key}
+                </div>
+              )}
+            </TableCell>
             <TableCell>
               <SeverityDisplay severity={item.severity} />
             </TableCell>
             <TableCell>
               <StatusDisplay status={item.status} />
             </TableCell>
-            <TableCell className="w-1/100" onClick={(e) => e.stopPropagation()}>
+            <TableCell onClick={(e) => e.stopPropagation()}>
               <Checkbox
+                className="mr-2"
                 checked={selectedRows.includes(item.id)}
                 onCheckedChange={() => handleRowSelection(item.id)}
               />
