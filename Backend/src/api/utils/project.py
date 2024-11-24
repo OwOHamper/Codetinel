@@ -7,6 +7,7 @@ import json
 from datetime import timezone, datetime
 from bson import ObjectId
 from src.AI.index.indexing import index_repository
+from bson.errors import InvalidId
 
 async def create_project(
     project_name: str = Form(...),
@@ -55,3 +56,22 @@ async def create_project(
         print(traceback.format_exc())
         
         raise HTTPException(status_code=400, detail=str(e)) 
+
+async def delete_project(project_id: str):
+    try:
+        # Validate ObjectId format
+        if not ObjectId.is_valid(project_id):
+            raise HTTPException(status_code=400, detail="Invalid project ID format")
+            
+        db = await get_database()
+        result = await db.projects.delete_one({"_id": ObjectId(project_id)})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Project not found")
+            
+        return {"message": "Project deleted successfully"}
+        
+    except InvalidId:
+        raise HTTPException(status_code=400, detail="Invalid project ID format")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
