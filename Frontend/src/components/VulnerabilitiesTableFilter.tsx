@@ -12,7 +12,6 @@ interface VulnerabilitiesTableFilterProps {
   setStatus: (status: string[]) => void
   selectedVulnerabilities: string[]
   projectId: string
-  setSelectedVulnerabilities: (vulnerabilities: string[]) => void
 }
 
 export default function VulnerabilitiesTableFilter({
@@ -22,7 +21,6 @@ export default function VulnerabilitiesTableFilter({
   setStatus,
   selectedVulnerabilities,
   projectId,
-  setSelectedVulnerabilities,
 }: VulnerabilitiesTableFilterProps) {
     const queryClient = useQueryClient()
 
@@ -35,9 +33,6 @@ export default function VulnerabilitiesTableFilter({
                     vulnerability_id: vulnId
                 })
             }
-
-            // Clear selections after starting tests
-            setSelectedVulnerabilities([])
 
             // Poll for changes every 2 seconds for up to 1 minute
             const pollInterval = 2000 // 2 seconds
