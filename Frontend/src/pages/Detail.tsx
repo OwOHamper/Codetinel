@@ -1,10 +1,11 @@
-import { Loader2, TriangleAlert } from 'lucide-react'
-import { useParams } from 'react-router-dom'
+import { ArrowLeft, Loader2, TriangleAlert } from 'lucide-react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery } from 'react-query'
 import axios from 'axios'
 
 export default function Detail() {
   const { projectId, errorId } = useParams()
+  const navigate = useNavigate()
 
   const fetchVulnerability = async () => {
     const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/vulnerabilities/get-vulnerability/${projectId}/${errorId}`)
@@ -32,11 +33,20 @@ export default function Detail() {
     )
   }
 
-  {console.log(vulnerability?.details.replace("\n$", ''))}
+  { console.log(vulnerability?.details.replace("\n$", '')) }
 
   return (
     <main className="max-w-screen-lg mx-auto p-4">
       <div className="grid items-center mb-8">
+        <div className="mb-4 flex items-center">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Back</span>
+          </button>
+        </div>
         <p className="text-xl text-gray-600 font-bold">{vulnerability?.cve || vulnerability?.cwe}</p>
         <h1 className="text-4xl font-black tracking-tight">{vulnerability?.vulnerability}</h1>
       </div>
@@ -46,7 +56,7 @@ export default function Detail() {
         <p className="font-bold text-2xl text-indigo-600">Summary of the Vulnerability</p>
       </div>
       <p className="mb-4">{vulnerability?.details.split("\\n")}</p>
-      
+
 
       {vulnerability?.last_test && (
         <>
