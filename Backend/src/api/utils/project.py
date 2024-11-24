@@ -55,25 +55,3 @@ async def create_project(
         print(traceback.format_exc())
         
         raise HTTPException(status_code=400, detail=str(e)) 
-
-async def get_vulnerabilities(project_id: str):
-    try:
-        db = await get_database()
-        
-        # Convert string ID to ObjectId
-        project = await db.projects.find_one({"_id": ObjectId(project_id)})
-        
-        if not project:
-            return {
-                "status": False,
-                "message": "Project not found"
-            }, 404
-            
-        return {
-            "project_name": project["project_name"],
-            "vulnerabilities": project["vulnerabilities"]
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e)) 
-#def get_project_data()

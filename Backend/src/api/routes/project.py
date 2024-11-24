@@ -6,7 +6,7 @@ from bson import ObjectId
 import pandas as pd
 import json
 from src.utils.normalizer import normalize_csv
-from src.api.utils.project import get_vulnerabilities, create_project
+from src.api.utils.project import create_project
 import traceback
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma

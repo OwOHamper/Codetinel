@@ -10,15 +10,13 @@ from src.db.mongodb import get_database
 import traceback
 import os
 from pathlib import Path
+from src.utils.get_vulnerabilities import get_vulnerabilities_by_id
 
 router = APIRouter()
 
 class VulnerabilityTestRequest(BaseModel):
     project_id: str
-    vulnerability_type: str
-    # endpoint: str
-    additional_context: str = None
-    file_context: str = None
+    vulnerability_id: str
 
 async def store_task_status(task_id: str, status: Dict):
     """Store task status in MongoDB"""
@@ -101,8 +99,8 @@ async def process_pentest_task(
         pentest_agent = PentestAgent(
             openai_api_key=settings.OPENAI_API_KEY,
             project_id=project_id,
-            target_url="http://localhost:3000",  # Configure this in settings
-            model_name="gpt-4",
+            target_url=deployment_url,
+            model_name="gpt-4o",
             temperature=0
         )
         
@@ -146,22 +144,72 @@ async def test_vulnerability(
     """
     Start a new pentest task
     """
+    # Get vulnerability details from project
+    vulnerabilities = await get_vulnerabilities_by_id(request.project_id)
+    if not vulnerabilities:
+        raise HTTPException(status_code=404, detail="Project or vulnerabilities not found")
+        
+    # Find the specific vulnerability
+    vulnerability = vulnerabilities.get(request.vulnerability_id)
+            
+    if not vulnerability:
+        raise HTTPException(status_code=404, detail="Vulnerability not found")
+
     task_id = str(uuid4())
-    
-    # Add task to background tasks
+    print("Vulnerability:", vulnerability)
+    # Convert file context to path:line format if it exists
+    file_context = vulnerability.get("location")
+    print("File context:", file_context)
+    if file_context and isinstance(file_context, str):
+        # Parse the Ruby-style string format
+        try:
+            # Remove curly braces and split by commas
+            content = file_context.strip('{}').split(',')
+            file_context_dict = {}
+            
+            for item in content:
+                key, value = item.split('=>')
+                # Clean up the strings
+                key = key.strip().strip('"')
+                value = value.strip()
+                # Convert numeric values
+                if value.isdigit():
+                    value = int(value)
+                else:
+                    value = value.strip('"')
+                file_context_dict[key] = value
+
+            file_path = file_context_dict.get('file')
+            start_line = file_context_dict.get('start_line')
+            
+            if file_path and start_line:
+                # If end_line exists, use middle line, otherwise use start_line
+                if 'end_line' in file_context_dict:
+                    end_line = file_context_dict['end_line']
+                    middle_line = start_line + ((end_line - start_line) // 2)
+                else:
+                    middle_line = start_line
+                    
+                file_context = f"{file_path}:{middle_line}"
+        except Exception as e:
+            print(f"Error parsing file context: {str(e)}")
+            file_context = None
+
+    print("File context:", file_context)
+    # Add task to background tasks with vulnerability details
     background_tasks.add_task(
         process_pentest_task,
         task_id=task_id,
         project_id=request.project_id,
-        vulnerability_type=request.vulnerability_type,
-        additional_context=request.additional_context,
-        file_context=request.file_context
+        vulnerability_type=vulnerability["vulnerability"],
+        additional_context=vulnerability.get("details"),
+        file_context=file_context
     )
     
     return {
         "task_id": task_id,
         "status": "processing",
-        "message": f"Testing {request.vulnerability_type} vulnerability"
+        "message": f"Testing {vulnerability['vulnerability']} vulnerability"
     }
 
 @router.get("/pentest/status/{task_id}")
