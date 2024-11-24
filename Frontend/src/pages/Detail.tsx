@@ -66,7 +66,7 @@ export default function Detail() {
           </div>
           <div>
             <p className="font-bold text-2xl text-indigo-600 mb-4">Code overview</p>
-            <p className="mb-2">Vulnerabilty found on line {vulnerability.last_test.result.line_number}</p>
+            <p className="mb-2">Vulnerabilty found on <b>line {vulnerability.last_test.result.line_number}</b></p>
             <div className="border border-black rounded-lg p-4 bg-gray-50">
               <pre className="whitespace-pre-wrap font-mono text-sm">
                 {vulnerability.last_test.result.file_context.split("\n").map((line, idx) => {
