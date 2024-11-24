@@ -54,6 +54,7 @@ export default function VulnerabilitiesTable({ data, selectedRows, setSelectedRo
           <TableHead>File key</TableHead>
           <TableHead>Severity</TableHead>
           <TableHead>Status</TableHead>
+          <TableHead>Exploitable</TableHead>
           <TableHead>
             <Checkbox
               className="mr-2"
@@ -79,6 +80,9 @@ export default function VulnerabilitiesTable({ data, selectedRows, setSelectedRo
             </TableCell>
             <TableCell>
               <StatusDisplay status={item.status} />
+            </TableCell>
+            <TableCell>
+              <span className="flex justify-center">{item.last_test ? (item.last_test?.result?.exploitable ? "✅" : "❌") : "N/A"}</span>
             </TableCell>
             <TableCell onClick={(e) => e.stopPropagation()}>
               <Checkbox
