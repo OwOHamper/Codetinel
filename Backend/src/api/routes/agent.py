@@ -10,7 +10,7 @@ from src.db.mongodb import get_database
 import traceback
 import os
 from pathlib import Path
-from src.utils.get_vulnerabilities import get_vulnerabilities_by_id
+from src.api.utils.vulnerabilities import get_vulnerabilities_by_id
 
 router = APIRouter()
 

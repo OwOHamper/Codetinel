@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from bson import ObjectId
 from src.db.mongodb import get_database
-from src.utils.get_vulnerabilities import get_vulnerabilities_by_id, get_vulnerability_by_id
+from src.api.utils.vulnerabilities import get_vulnerabilities_by_id, get_vulnerability_by_id
 from fastapi import APIRouter
 
 router = APIRouter()
