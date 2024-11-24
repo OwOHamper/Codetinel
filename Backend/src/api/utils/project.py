@@ -1,7 +1,7 @@
 import traceback
 from fastapi import HTTPException, UploadFile, File, Form, BackgroundTasks
 from src.db.mongodb import get_database
-from src.utils.normalizer import normalize_csv
+from src.api.utils.normalizer import normalize_csv
 import pandas as pd
 import json
 from datetime import timezone, datetime
