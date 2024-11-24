@@ -45,7 +45,7 @@ export default function Detail() {
         <TriangleAlert className="bg-indigo-600 text-white rounded-lg p-2 w-10 h-10" />
         <p className="font-bold text-2xl text-indigo-600">Summary of the Vulnerability</p>
       </div>
-      <p className="mb-4">{vulnerability?.details.replace(/\n$/, '')}</p>
+      <p className="mb-4">{vulnerability?.details.split("\\n")}</p>
       
 
       {vulnerability?.last_test && (
