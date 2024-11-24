@@ -73,10 +73,10 @@ export default function VulnerabilitiesTable({ data }: TableProps) {
             <TableCell>
               <StatusDisplay status={row.status} />
             </TableCell>
-            <TableCell className="w-1/100">
+            <TableCell className="w-1/100" onClick={(e) => e.stopPropagation()}>
               <Checkbox
-                checked={selectedRows.has(id)}
-                onCheckedChange={() => handleRowSelection(id)}
+                checked={selectedRows.has(parseInt(id))}
+                onCheckedChange={() => handleRowSelection(parseInt(id))}
               />
             </TableCell>
           </TableRow>
