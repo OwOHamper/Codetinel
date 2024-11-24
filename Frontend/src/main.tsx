@@ -21,7 +21,7 @@ const queryClient = new QueryClient();
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <img src="/logo.png" alt="logo" className="w-24 h-24 absolute top-0 left-4" />
+      <img src="/logo.png" alt="logo" className="w-24 h-24 fixed top-0 left-4" />
       <Router>
         <Routes>
           <Route path="/" element={<Navigate to="/projects" replace />} />
