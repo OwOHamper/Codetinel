@@ -1,11 +1,13 @@
 import uuid
 def normalize_csv(csv_data):
         output = {
-        str(uuid.uuid4()): {key.replace(' ', '_').lower(): value for key, value in item.items()} for item in csv_data
+            str(uuid.uuid4()): {
+                **{key.replace(' ', '_').lower(): value for key, value in item.items()},
+                "id": str(uuid.uuid4()),
+                "status": "not_started"
+            } for item in csv_data
         }
-        for i in output:
-            output[i]["status"] = "not_started"
-            # print(output[i]["details"])
+            
         
 
         # Define severity order
