@@ -1,6 +1,7 @@
 import { ArrowLeft, Loader2, TriangleAlert } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery } from 'react-query'
+import { X } from 'lucide-react'
 import axios from 'axios'
 
 export default function Detail() {
@@ -51,18 +52,17 @@ export default function Detail() {
         <h1 className="text-4xl font-black tracking-tight">{vulnerability?.vulnerability}</h1>
       </div>
 
-      <div className="flex items-center gap-2 mb-4">
-        <TriangleAlert className="bg-indigo-600 text-white rounded-lg p-2 w-10 h-10" />
-        <p className="font-bold text-2xl text-indigo-600">Summary of the Vulnerability</p>
-      </div>
-      <p className="mb-4">{vulnerability?.details.split("\\n")}</p>
-
 
       {vulnerability?.last_test ? (
         vulnerability?.last_test.result ? (
 
           vulnerability.last_test.result.exploitable ? (
             <>
+              <div className="flex items-center gap-2 mb-4">
+                <TriangleAlert className="bg-indigo-600 text-white rounded-lg p-2 w-10 h-10" />
+                <p className="font-bold text-2xl text-indigo-600">Summary of the Vulnerability</p>
+              </div>
+              <p className="mb-4">{vulnerability?.details.split("\\n")}</p>
               <div className="mb-4">
                 <p className="font-bold text-2xl text-indigo-600 mb-4">Suggestion</p>
                 <p>{vulnerability.last_test.result.suggestion}</p>
@@ -88,13 +88,56 @@ export default function Detail() {
               </div>
             </>
           ) : (
-            <p>This vulnerability was not exploitable</p>
+            <>
+
+              <div className="flex items-center mt-4 mb-4">
+                <div className="bg-indigo-100 text-indigo-600 border border-indigo-300 rounded-lg py-2 flex items-center">
+                  <X className="ml-2" />
+                  <p className="m-0 px-2">This vulnerability was not exploitable</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mb-4">
+                <TriangleAlert className="bg-indigo-600 text-white rounded-lg p-2 w-10 h-10" />
+                <p className="font-bold text-2xl text-indigo-600">Summary of the Vulnerability</p>
+              </div>
+              <p className="mb-4">{vulnerability?.details.split("\\n")}</p>
+            </>
           )
         ) : (
-          <p>Failed to test the vulnerability</p>
+          <>
+            <div className="flex items-center mt-4 mb-4">
+              <div className="bg-indigo-100 text-indigo-600 border border-indigo-300 rounded-lg py-2 flex items-center">
+                <X className="ml-2" />
+                <p className="m-0 px-2">Failed to test the vulnerability</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 mb-4">
+              <TriangleAlert className="bg-indigo-600 text-white rounded-lg p-2 w-10 h-10" />
+              <p className="font-bold text-2xl text-indigo-600">Summary of the Vulnerability</p>
+            </div>
+            <p className="mb-4">{vulnerability?.details.split("\\n")}</p>
+            <div className="border border-black rounded-lg p-4 bg-gray-50">
+              <pre className="whitespace-pre-wrap font-mono text-sm">
+                {vulnerability.last_test.error}
+              </pre>
+            </div>
+          </>
         )
       ) : (
-        <p>Vulnerability not tested yet</p>
+        <>
+          <div className="flex items-center mt-4 mb-4">
+            <div className="bg-indigo-100 text-indigo-600 border border-indigo-300 rounded-lg py-2 flex items-center">
+              <X className="ml-2" />
+              <p className="m-0 px-2">Vulnerability not tested yet</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 mb-4">
+            <TriangleAlert className="bg-indigo-600 text-white rounded-lg p-2 w-10 h-10" />
+            <p className="font-bold text-2xl text-indigo-600">Summary of the Vulnerability</p>
+          </div>
+          <p className="mb-4">{vulnerability?.details.split("\\n")}</p>
+
+        </>
       )}
     </main>
   )
