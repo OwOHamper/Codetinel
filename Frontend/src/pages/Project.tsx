@@ -7,31 +7,24 @@ import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import { useState } from 'react'
 
-const chartData = [
-  { browser: "critical", visitors: 275, fill: "#f87171" },
-  { browser: "high", visitors: 200, fill: "#fb923c" },
-  { browser: "medium", visitors: 287, fill: "#facc15" },
-  { browser: "low", visitors: 173, fill: "#4ade80" },
-]
-
 const chartConfig = {
   visitors: {
-    label: "Visitors",
+    label: "Count",
   },
   critical: {
-    label: "Chrome",
+    label: "Critical",
     color: "#f87171",
   },
   high: {
-    label: "Safari",
+    label: "High",
     color: "#fb923c",
   },
   medium: {
-    label: "Firefox",
+    label: "Medium",
     color: "#facc15",
   },
   low: {
-    label: "Edge",
+    label: "Low",
     color: "#4ade80",
   },
 }
@@ -61,6 +54,29 @@ export default function Project() {
     return severityMatch && statusMatch
   }) : []
 
+  const getChartData = (data: any[]) => {
+    const severityCounts = {
+      critical: 0,
+      high: 0,
+      medium: 0,
+      low: 0,
+    }
+
+    data.forEach((item: any) => {
+      const severity = item.severity.toLowerCase()
+      if (severity in severityCounts) {
+        severityCounts[severity as keyof typeof severityCounts]++
+      }
+    })
+
+    return [
+      { browser: "critical", visitors: severityCounts.critical, fill: "#f87171" },
+      { browser: "high", visitors: severityCounts.high, fill: "#fb923c" },
+      { browser: "medium", visitors: severityCounts.medium, fill: "#facc15" },
+      { browser: "low", visitors: severityCounts.low, fill: "#4ade80" },
+    ]
+  }
+
   return queryStatus === "loading" ? (
     <div className="h-screen flex justify-center items-center">
       <Loader2
@@ -80,7 +96,10 @@ export default function Project() {
         </div>
 
         <div className="block">
-          <CustomPieChart chartData={chartData} chartConfig={chartConfig} />
+          <CustomPieChart 
+            chartData={getChartData(Object.values(data))} 
+            chartConfig={chartConfig} 
+          />
         </div>
       </div>
 
