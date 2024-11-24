@@ -12,6 +12,7 @@ interface VulnerabilitiesTableFilterProps {
   setStatus: (status: string[]) => void
   selectedVulnerabilities: string[]
   projectId: string
+  setSelectedVulnerabilities: (vulnerabilities: number[]) => void
 }
 
 export default function VulnerabilitiesTableFilter({
@@ -21,6 +22,7 @@ export default function VulnerabilitiesTableFilter({
   setStatus,
   selectedVulnerabilities,
   projectId,
+  setSelectedVulnerabilities,
 }: VulnerabilitiesTableFilterProps) {
     const queryClient = useQueryClient()
 
@@ -33,6 +35,9 @@ export default function VulnerabilitiesTableFilter({
                     vulnerability_id: vulnId
                 })
             }
+
+            // Clear selections after starting the tests
+            setSelectedVulnerabilities([]);
 
             // Poll for changes every 2 seconds for up to 1 minute
             const pollInterval = 2000 // 2 seconds
@@ -72,8 +77,8 @@ export default function VulnerabilitiesTableFilter({
                     label="Status"
                     options={[
                         { value: "not_started", element: <StatusDisplay status="not_started" /> },
-                        { value: "queued", element: <StatusDisplay status="queued" /> },
-                        { value: "pending", element: <StatusDisplay status="pending" /> },
+                        { value: "processing", element: <StatusDisplay status="processing" /> },
+                        { value: "failed", element: <StatusDisplay status="failed" /> },
                         { value: "completed", element: <StatusDisplay status="completed" /> },
                     ]}
                     selected={status}
