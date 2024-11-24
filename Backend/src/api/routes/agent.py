@@ -18,7 +18,7 @@ class VulnerabilityTestRequest(BaseModel):
     project_id: str
     vulnerability_id: str
 
-async def store_task_status(task_id: str, status: Dict):
+async def store_task_status(task_id: str, status: str):
     """Store task status in MongoDB"""
     db = await get_database()
     await db.agent_tasks.update_one(
