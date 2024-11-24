@@ -66,7 +66,7 @@ export default function VulnerabilitiesTable({ data }: TableProps) {
       <TableBody>
         {Object.entries(data).map(([id, row]) => (
           <TableRow key={row.name} className="cursor-pointer" onClick={() => navigate(`./error/id`)}>
-            <TableCell className="w-1/2">{row.name}</TableCell>
+            <TableCell className="w-1/2">{row.cve || row.cwe}</TableCell>
             <TableCell>
               <SeverityDisplay severity={row.severity} />
             </TableCell>

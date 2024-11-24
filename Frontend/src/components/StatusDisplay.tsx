@@ -1,9 +1,8 @@
-import React from "react";
 import { TriangleAlert, CircleCheck, Clock3, FlaskConical } from "lucide-react";
 
 
 interface StatusProps {
-    status: "detected" | "queued" | "pending" | "finished"; // Define the statuses
+    status: "detected" | "queued" | "pending" | "completed" | "not_started"; // Define the statuses
 }
 
 function StatusDisplay({ status }: StatusProps) {
@@ -18,8 +17,11 @@ function StatusDisplay({ status }: StatusProps) {
         case "pending":
             Icon = FlaskConical;
             break;
-        case "finished":
+        case "completed":
             Icon = CircleCheck;
+            break;
+        case "not_started":
+            Icon = TriangleAlert;
             break;
     }
 
