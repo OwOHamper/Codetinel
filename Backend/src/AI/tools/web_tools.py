@@ -6,49 +6,83 @@ from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 import traceback
 
-@tool
-async def web_request(
-    method: str = Field(..., description="HTTP method (GET, POST, etc.)"),
-    path: str = Field(..., description="URL path to request"),
-    headers: Optional[Dict[str, str]] = Field(default=None, description="Request headers"),
-    data: Optional[Dict[str, Any]] = Field(default=None, description="Request body data"),
-    base_url: str = Field(..., description="Base URL for the request")
-) -> Dict[str, Any]:
-    """Make HTTP requests to the target web application"""
-    # Get the actual values from the Field objects
-    method = method if isinstance(method, str) else method.default
-    path = path if isinstance(path, str) else path.default
-    headers = headers.default if hasattr(headers, 'default') else headers
-    data = data.default if hasattr(data, 'default') else data
-    base_url = base_url if isinstance(base_url, str) else base_url.default
+def create_web_request(base_url: str):
+    """Creates a web request tool with pre-configured base URL"""
     
-    print("Using web request tool")
-    print(f"Method: {method}")
-    print(f"Path: {path}")
-    print(f"Headers: {headers}")
-    print(f"Data: {data}")
-    print(f"Base URL: {base_url}")
-    
-    url = f"{base_url.rstrip('/')}/{path.lstrip('/')}"
-    async with aiohttp.ClientSession() as session:
-        async with session.request(
-            method=method,
-            url=url,
-            headers=headers,
-            json=data
-        ) as response:
-            status = response.status
-            response_headers = dict(response.headers)
-            try:
-                response_data = await response.json()
-            except:
-                response_data = await response.text()
-            
+    @tool
+    async def web_request(
+        method: str = Field(..., description="HTTP method (GET, POST, etc.)"),
+        path: str = Field(..., description="URL path to request"),
+        headers: Optional[Dict[str, str]] = Field(default=None, description="Request headers"),
+        data: Optional[Dict[str, Any]] = Field(default=None, description="Request body data")
+    ) -> Dict[str, Any]:
+        """Make HTTP requests to the target web application"""
+        # Get the actual values from the Field objects
+        method = method if isinstance(method, str) else method.default
+        path = path if isinstance(path, str) else path.default
+        headers = headers.default if hasattr(headers, 'default') else headers
+        data = data.default if hasattr(data, 'default') else data
+
+        # Validate and normalize method
+        method = method.upper()
+        if method not in ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS']:
             return {
-                "status": status,
-                "headers": response_headers,
-                "data": response_data
+                "error": f"Invalid HTTP method: {method}",
+                "status": 400,
+                "data": None
             }
+
+        # Handle case where path is a full URL
+        if path.lower().startswith(('http://', 'https://')):
+            if not path.lower().startswith(base_url.lower()):
+                return {
+                    "error": f"Path must be relative or start with base URL: {base_url}",
+                    "status": 400,
+                    "data": None
+                }
+            # Extract the path portion from the full URL
+            path = path[len(base_url.rstrip('/')):]
+
+        # Clean up path
+        path = path.lstrip('/')
+        
+        print("Using web request tool")
+        print(f"Method: {method}")
+        print(f"Path: {path}")
+        print(f"Headers: {headers}")
+        print(f"Data: {data}")
+        print(f"Base URL: {base_url}")
+        
+        url = f"{base_url.rstrip('/')}/{path}"
+        
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.request(
+                    method=method,
+                    url=url,
+                    headers=headers,
+                    json=data
+                ) as response:
+                    status = response.status
+                    response_headers = dict(response.headers)
+                    try:
+                        response_data = await response.json()
+                    except:
+                        response_data = await response.text()
+                    
+                    return {
+                        "status": status,
+                        "headers": response_headers,
+                        "data": response_data
+                    }
+        except aiohttp.ClientError as e:
+            return {
+                "error": f"Request failed: {str(e)}",
+                "status": 500,
+                "data": None
+            }
+    
+    return web_request
 
 def create_code_search(project_id: str, persist_directory: str = "./chroma_db"):
     """Creates a code search tool with pre-configured project ID"""

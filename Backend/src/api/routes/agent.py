@@ -99,8 +99,8 @@ async def process_pentest_task(
         pentest_agent = PentestAgent(
             openai_api_key=settings.OPENAI_API_KEY,
             project_id=project_id,
-            target_url="http://localhost:3000",  # Configure this in settings
-            model_name="gpt-4",
+            target_url=deployment_url,
+            model_name="gpt-4o",
             temperature=0
         )
         
@@ -158,7 +158,7 @@ async def test_vulnerability(
     task_id = str(uuid4())
     print("Vulnerability:", vulnerability)
     # Convert file context to path:line format if it exists
-    file_context = vulnerability.get("file_context")
+    file_context = vulnerability.get("location")
     print("File context:", file_context)
     if file_context and isinstance(file_context, str):
         # Parse the Ruby-style string format
