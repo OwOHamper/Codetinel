@@ -245,7 +245,7 @@ async def test_vulnerability(
         vulnerability_type=vulnerability["vulnerability"],
         additional_context=vulnerability.get("details"),
         file_context=file_context,
-        line_number=start_line or None,
+        line_number=middle_line or None,
     )
     
     return {
