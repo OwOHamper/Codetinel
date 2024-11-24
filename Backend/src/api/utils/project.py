@@ -1,7 +1,7 @@
 import traceback
 from fastapi import HTTPException, UploadFile, File, Form, BackgroundTasks
 from src.db.mongodb import get_database
-from src.utils.normalizer import normalize_csv
+from src.api.utils.normalizer import normalize_csv
 import pandas as pd
 import json
 from datetime import timezone, datetime
@@ -73,5 +73,18 @@ async def delete_project(project_id: str):
         
     except InvalidId:
         raise HTTPException(status_code=400, detail="Invalid project ID format")
+    except Exception as e: 
+        raise HTTPException(status_code=500, detail=str(e))
+    
+async def edit_deployment_url(project_id: str, deployment_url: str):
+    try:
+        db = await get_database()
+        result = await db.projects.update_one({"_id": ObjectId(project_id)}, {"$set": {"deployment_url": deployment_url}})
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Failed to change url (project not found or url already updated)")
+        
+        return {"message": "Deployment URL updated successfully"}
+    
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

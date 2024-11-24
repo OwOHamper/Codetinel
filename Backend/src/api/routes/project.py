@@ -5,8 +5,8 @@ from datetime import datetime
 from bson import ObjectId
 import pandas as pd
 import json
-from src.utils.normalizer import normalize_csv
-from src.api.utils.project import create_project, delete_project
+from src.api.utils.normalizer import normalize_csv
+from src.api.utils.project import create_project, delete_project, edit_deployment_url   
 import traceback
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
@@ -23,9 +23,13 @@ async def create_project_route(
 ):
     return await create_project(project_name, csv_file, url, deployment_url, background_tasks)
 
-@router.post("/delete")
+@router.delete("/delete")
 async def delete_project_route(project_id: str = Form(...)):
     return await delete_project(project_id)
+
+@router.post("/edit-deployment-url")
+async def edit_deployment_url_route(project_id: str = Form(...), deployment_url: str = Form(...)):
+    return await edit_deployment_url(project_id, deployment_url)
 
 @router.get("/indexing-status/{project_id}")
 async def get_indexing_status(project_id: str):
@@ -146,5 +150,18 @@ async def get_all_projects():
         for project in projects:
             project["_id"] = str(project["_id"])
         return projects
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching projects: {str(e)}")
+
+@router.get("/get_project/{project_id}")
+async def get_project(project_id: str):
+    """Get a specific project from the database"""
+    try:    
+        db = await get_database()
+        project = await db.projects.find_one({"_id": ObjectId(project_id)})
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        project["_id"] = str(project["_id"])
+        return project
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching projects: {str(e)}")

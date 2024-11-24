@@ -1,12 +1,11 @@
-import React from "react";
 import { TriangleAlert, CircleCheck, Clock3, FlaskConical } from "lucide-react";
 
 
 interface StatusProps {
-    status: "detected" | "queued" | "pending" | "finished"; // Define the statuses
+    status: "detected" | "queued" | "pending" | "completed" | "not_started"; // Define the statuses
 }
 
-export default function StatusDisplay({ status }: StatusProps) {
+function StatusDisplay({ status }: StatusProps) {
     let Icon;
     switch (status) {
         case "detected":
@@ -18,15 +17,20 @@ export default function StatusDisplay({ status }: StatusProps) {
         case "pending":
             Icon = FlaskConical;
             break;
-        case "finished":
+        case "completed":
             Icon = CircleCheck;
+            break;
+        case "not_started":
+            Icon = TriangleAlert;
             break;
     }
 
     return (
-        <span className="flex items-center capitalize">
+        <div className="flex items-center capitalize">
             <Icon className="mr-1 h-4 w-4" />
             {status}
-        </span>
+        </div>
     )
 }
+
+export default StatusDisplay

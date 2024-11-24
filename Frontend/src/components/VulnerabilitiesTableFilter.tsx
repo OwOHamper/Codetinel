@@ -1,13 +1,21 @@
-import { useState } from "react"
 import MultiSelect from "@/components/MultiSelect"
 import { Button } from "@/components/ui/button"
-import SeverityDisplay from "./SeverityDipslay"
-import StatusDisplay from "./StatusDisplay"
+import SeverityDisplay from "@/components/SeverityDipslay"
+import StatusDisplay from "@/components/StatusDisplay"
 
-export default function VulnerabilitiesTableFilter() {
-    const [severity, setSeverity] = useState([])
-    const [status, setStatus] = useState([])
+interface VulnerabilitiesTableFilterProps {
+  severity: string[]
+  setSeverity: (severity: string[]) => void
+  status: string[]
+  setStatus: (status: string[]) => void
+}
 
+export default function VulnerabilitiesTableFilter({
+  severity,
+  setSeverity,
+  status,
+  setStatus
+}: VulnerabilitiesTableFilterProps) {
     return (
         <div className="flex gap-2 items-end justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -25,10 +33,10 @@ export default function VulnerabilitiesTableFilter() {
                 <MultiSelect
                     label="Status"
                     options={[
-                        { value: "detected", element: <StatusDisplay status="detected" /> },
+                        { value: "not_started", element: <StatusDisplay status="not_started" /> },
                         { value: "queued", element: <StatusDisplay status="queued" /> },
                         { value: "pending", element: <StatusDisplay status="pending" /> },
-                        { value: "finished", element: <StatusDisplay status="finished" /> },
+                        { value: "completed", element: <StatusDisplay status="completed" /> },
                     ]}
                     selected={status}
                     setSelected={setStatus}

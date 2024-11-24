@@ -1,11 +1,10 @@
-import React from "react";
 import clsx from "clsx"; // Optional for conditional classes
 
 interface SeverityPillProps {
     severity: "low" | "medium" | "high" | "critical"; // Define the severity levels
 }
 
-export default function SeverityDisplay({ severity }: SeverityPillProps) {
+function SeverityDisplay({ severity }: SeverityPillProps) {
     const pillStyles = clsx(
         "px-3 py-1 text-xs font-medium rounded-full capitalize inline-flex items-center justify-center", // Common pill styles
         {
@@ -33,4 +32,6 @@ export default function SeverityDisplay({ severity }: SeverityPillProps) {
         </div >
     )
 }
+
+export default SeverityDisplay
 
