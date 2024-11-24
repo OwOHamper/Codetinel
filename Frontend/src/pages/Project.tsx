@@ -6,6 +6,7 @@ import { useQuery } from 'react-query'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import { useState } from 'react'
+import StatusDisplay from '@/components/StatusDisplay'
 
 const chartConfig = {
   visitors: {
@@ -47,6 +48,16 @@ export default function Project() {
   const { data, status: queryStatus } = useQuery({
     queryKey: ['project', projectId],
     queryFn: fetchProject,
+  })
+
+  const { data: indexingData } = useQuery({
+    queryKey: ['indexing-status', projectId],
+    queryFn: async () => {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/project/indexing-status/${projectId}`)
+      return response.data
+    },
+    enabled: !!projectId,
+    refetchInterval: 5000,
   })
 
   const filteredData = data ? Object.values(data.vulnerabilities).filter((item: any) => {
@@ -94,6 +105,11 @@ export default function Project() {
         <div>
           <p className="text-xl text-indigo-600 font-bold">Project name</p>
           <h1 className="text-4xl text-indigo-800 font-black tracking-tight lg:text-5xl">{data.project_name}</h1>
+          {indexingData && (
+            <p className="text-gray-600 mt-2 flex items-center gap-2">
+              Indexing Status: <StatusDisplay status={indexingData.status} />
+            </p>
+          )}
         </div>
 
         <div className="block">
@@ -110,6 +126,7 @@ export default function Project() {
         status={status}
         setStatus={setStatus}
         selectedVulnerabilities={selectedRows}
+        setSelectedVulnerabilities={setSelectedRows}
         projectId={projectId!}
       />
       <VulnerabilitiesTable 

@@ -200,6 +200,7 @@ async def test_vulnerability(
     # Convert file context to path:line format if it exists
     file_context = vulnerability.get("location")
     print("File context:", file_context)
+    middle_line = None
     if file_context and isinstance(file_context, str):
         # Parse the Ruby-style string format
         try:

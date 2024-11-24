@@ -10,6 +10,7 @@ export default function CreateProject() {
   const [title, setTitle] = useState("")
   const [deployUrl, setDeployUrl] = useState("")
   const [file, setFile] = useState<File | null>(null)
+  const [url, setUrl] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,8 +20,8 @@ export default function CreateProject() {
     try {
       const formData = new FormData()
       formData.append("project_name", title)
-      formData.append("deployment_url", deployUrl)
-      formData.append("url", "http://localhost:3000")
+      formData.append("deployment_url", url)
+      formData.append("url", deployUrl)
       if (file) formData.append("csv_file", file)
 
       const response = await axios.post(
@@ -33,7 +34,7 @@ export default function CreateProject() {
         }
       )
 
-      navigate(`/projects/${response.data.project_id}`)
+      navigate(`/projects/${response.data.project_id}`, { replace: true })
     } catch (error: any) {
       console.log("Failed to create project: " + error.message)
     } finally {
@@ -69,18 +70,31 @@ export default function CreateProject() {
       <div>
         <h1 className="text-4xl font-black tracking-tight lg:text-5xl mt-5 text-indigo-600">Insert data</h1>
 
-        <div className="relative">
-          <Input
-            type="text"
-            placeholder="Write the url of your source code"
-            value={deployUrl}
-            onChange={(e) => setDeployUrl(e.target.value)}
-            className="mt-4 hover:bg-gray-100 pl-9"
-          />
-          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-            <Link className="h-4 w-4" />
-          </span>
-        </div>
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder="Write the url of your source code"
+              value={deployUrl}
+              onChange={(e) => setDeployUrl(e.target.value)}
+              className="mt-4 hover:bg-gray-100 pl-9"
+            />
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+              <Link className="h-4 w-4" />
+            </span>
+          </div>
+
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder="Write the url of the deployment which should be tested on"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              className="mt-2 hover:bg-gray-100 pl-9"
+            />
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+              <Link className="h-4 w-4" />
+            </span>
+          </div>
 
         <div className="relative">
           <Input
