@@ -1,9 +1,9 @@
 import CustomPieChart from '@/components/CustomPieChart'
 import VulnerabilitiesTable from '@/components/VulnerabilitiesTable'
 import VulnerabilitiesTableFilter from '@/components/VulnerabilitiesTableFilter'
-import { Loader2 } from 'lucide-react'
+import { ArrowLeft, Loader2 } from 'lucide-react'
 import { useQuery } from 'react-query'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import { useState } from 'react'
 
@@ -34,6 +34,7 @@ export default function Project() {
   const [severity, setSeverity] = useState<string[]>([])
   const [status, setStatus] = useState<string[]>([])
   const [selectedRows, setSelectedRows] = useState<string[]>([])
+  const navigate = useNavigate()
 
   const fetchProject = async () => {
     try {
@@ -92,19 +93,27 @@ export default function Project() {
     <main className="max-w-screen-lg mx-auto p-4">
       <div className="grid items-center grid-cols-2 mb-4">
         <div>
-          <p className="text-xl text-indigo-600 font-bold">Project name</p>
+          <div className="mb-4 flex items-center">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span>Back</span>
+            </button>
+          </div>
           <h1 className="text-4xl text-indigo-800 font-black tracking-tight lg:text-5xl">{data.project_name}</h1>
         </div>
 
         <div className="block">
-          <CustomPieChart 
-            chartData={getChartData(Object.values(data.vulnerabilities))} 
-            chartConfig={chartConfig} 
+          <CustomPieChart
+            chartData={getChartData(Object.values(data.vulnerabilities))}
+            chartConfig={chartConfig}
           />
         </div>
       </div>
 
-      <VulnerabilitiesTableFilter 
+      <VulnerabilitiesTableFilter
         severity={severity}
         setSeverity={setSeverity}
         status={status}
@@ -112,8 +121,8 @@ export default function Project() {
         selectedVulnerabilities={selectedRows}
         projectId={projectId!}
       />
-      <VulnerabilitiesTable 
-        data={filteredData} 
+      <VulnerabilitiesTable
+        data={filteredData}
         selectedRows={selectedRows}
         setSelectedRows={setSelectedRows}
       />
