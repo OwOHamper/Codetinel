@@ -34,7 +34,7 @@ export default function CreateProject() {
         }
       )
 
-      navigate(`/projects/${response.data.project_id}`)
+      navigate(`/projects/${response.data.project_id}`, { replace: true })
     } catch (error: any) {
       console.log("Failed to create project: " + error.message)
     } finally {
