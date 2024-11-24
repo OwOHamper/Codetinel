@@ -15,7 +15,6 @@ async def create_project(
     url: str = Form(...),
     deployment_url: str = Form(...), 
     background_tasks: BackgroundTasks = None,
-       
 ):
     try:
         # Read CSV content
@@ -39,7 +38,7 @@ async def create_project(
         result = await db.projects.insert_one(project_data)
         project_id = str(result.inserted_id)
         
-        # Add background task for indexing
+        # Add background task for indexing without awaiting it
         if background_tasks:
             background_tasks.add_task(
                 index_repository,
@@ -47,6 +46,7 @@ async def create_project(
                 repo_url=url
             )
         
+        # Return immediately after scheduling the task
         return {
             "message": "Project created successfully, indexing started",
             "project_id": project_id
@@ -54,8 +54,7 @@ async def create_project(
         
     except Exception as e:
         print(traceback.format_exc())
-        
-        raise HTTPException(status_code=400, detail=str(e)) 
+        raise HTTPException(status_code=400, detail=str(e))
 
 async def delete_project(project_id: str):
     try:

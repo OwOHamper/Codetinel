@@ -2,42 +2,33 @@ import uuid
 
 
 def get_file(file_context):
-    print(file_context)
-    if file_context and isinstance(file_context, str):
-        # Parse the Ruby-style string format
+    if not file_context:
+        return ""
+        
+    if isinstance(file_context, dict):
+        # If it's already a dictionary, just get the file path
+        file_path = file_context.get('file')
+        start_line = file_context.get('start_line')
+    else:
         try:
-            # Remove curly braces and split by commas
-            content = file_context.strip('{}').split(',')
-            file_context_dict = {}
+            # Try to evaluate the string as a Python dict
+            # This handles the Ruby-style hash syntax
+            file_context = file_context.replace('=>', ':')
+            file_context_dict = eval(file_context)
             
-            for item in content:
-                key, value = item.split('=>')
-                # Clean up the strings
-                key = key.strip().strip('"')
-                value = value.strip()
-                # Convert numeric values
-                if value.isdigit():
-                    value = int(value)
-                else:
-                    value = value.strip('"')
-                file_context_dict[key] = value
-
             file_path = file_context_dict.get('file')
             start_line = file_context_dict.get('start_line')
             
-            if file_path and start_line:
-            #     # If end_line exists, use middle line, otherwise use start_line
-                if 'end_line' in file_context_dict:
-                    end_line = file_context_dict['end_line']
-                    return f"{file_path}:{start_line}-{end_line}"
-            #         middle_line = start_line + ((end_line - start_line) // 2)
-            #     else:
-            #         middle_line = start_line
-                    
-            return f"{file_path}:{start_line}"
         except Exception as e:
             print(f"Error parsing file context: {str(e)}")
             return ""
+
+    if file_path and start_line:
+        if 'end_line' in file_context_dict:
+            end_line = file_context_dict['end_line']
+            return f"{file_path}:{start_line}-{end_line}"
+    
+    return file_path if file_path else ""
 
 def normalize_csv(csv_data):
         output = {
