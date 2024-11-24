@@ -19,8 +19,10 @@ class VulnerabilityTestRequest(BaseModel):
     vulnerability_id: str
 
 async def store_task_status(task_id: str, status: Dict):
-    """Store task status in MongoDB"""
+    """Store task status in MongoDB and update vulnerability status"""
     db = await get_database()
+    
+    # First store/update the task status
     await db.agent_tasks.update_one(
         {"task_id": task_id},
         {"$set": {
@@ -29,6 +31,36 @@ async def store_task_status(task_id: str, status: Dict):
         }},
         upsert=True
     )
+    
+    # If we have project_id and vulnerability_id, update the vulnerability status
+    if "project_id" in status and "vulnerability_id" in status:
+        project_id = status["project_id"]
+        vulnerability_id = status["vulnerability_id"]
+        
+        # Build the complete last_test object first
+        last_test = {
+            "task_id": task_id,
+            "timestamp": datetime.now(tz=timezone.utc),
+            "status": status["status"]
+        }
+        
+        # Add optional fields to last_test
+        if "result" in status:
+            last_test["result"] = status["result"]
+        if "error" in status:
+            last_test["error"] = status["error"]
+            
+        # Create the update data
+        vulnerability_update = {
+            f"vulnerabilities.{vulnerability_id}.status": status["status"],
+            f"vulnerabilities.{vulnerability_id}.last_test": last_test
+        }
+        
+        # Update the project's vulnerability status
+        await db.projects.update_one(
+            {"_id": ObjectId(project_id)},
+            {"$set": vulnerability_update}
+        )
 
 async def get_file_context(file_path: str, line_number: int, context_lines: int = 10) -> str:
     """
@@ -74,6 +106,7 @@ async def get_file_context(file_path: str, line_number: int, context_lines: int 
 async def process_pentest_task(
     task_id: str,
     project_id: str,
+    vulnerability_id: str,
     vulnerability_type: str,
     additional_context: str = None,
     file_context: str = None
@@ -104,16 +137,16 @@ async def process_pentest_task(
             temperature=0
         )
         
-        # Update initial status
+        # Update status to processing
         await store_task_status(task_id, {
-            "task_id": task_id,
             "status": "processing",
             "project_id": project_id,
+            "vulnerability_id": vulnerability_id,
             "vulnerability_type": vulnerability_type,
-            "created_at": datetime.now(tz=timezone.utc)
+            "started_at": datetime.now(tz=timezone.utc)
         })
 
-        # Process vulnerability test with enhanced file context
+        # Process vulnerability test
         response = await pentest_agent.test_vulnerability(
             vulnerability_type=vulnerability_type,
             additional_context=additional_context,
@@ -124,7 +157,10 @@ async def process_pentest_task(
         # Store success result
         await store_task_status(task_id, {
             "status": "completed",
-            "result": response
+            "result": response,
+            "project_id": project_id,
+            "vulnerability_id": vulnerability_id,
+            "completed_at": datetime.now(tz=timezone.utc)
         })
 
     except Exception as e:
@@ -133,7 +169,10 @@ async def process_pentest_task(
         # Store error result
         await store_task_status(task_id, {
             "status": "failed",
-            "error": str(e)
+            "error": str(e),
+            "project_id": project_id,
+            "vulnerability_id": vulnerability_id,
+            "failed_at": datetime.now(tz=timezone.utc)
         })
 
 @router.post("/pentest/test")
@@ -156,7 +195,6 @@ async def test_vulnerability(
         raise HTTPException(status_code=404, detail="Vulnerability not found")
 
     task_id = str(uuid4())
-    print("Vulnerability:", vulnerability)
     # Convert file context to path:line format if it exists
     file_context = vulnerability.get("location")
     print("File context:", file_context)
@@ -201,6 +239,7 @@ async def test_vulnerability(
         process_pentest_task,
         task_id=task_id,
         project_id=request.project_id,
+        vulnerability_id=request.vulnerability_id,
         vulnerability_type=vulnerability["vulnerability"],
         additional_context=vulnerability.get("details"),
         file_context=file_context
