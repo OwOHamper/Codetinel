@@ -16,8 +16,11 @@ async def web_request(
 ) -> Dict[str, Any]:
     """Make HTTP requests to the target web application"""
     # Get the actual values from the Field objects
-    headers = {} if headers is None else headers
-    data = {} if data is None else data
+    method = method if isinstance(method, str) else method.default
+    path = path if isinstance(path, str) else path.default
+    headers = headers.default if hasattr(headers, 'default') else headers
+    data = data.default if hasattr(data, 'default') else data
+    base_url = base_url if isinstance(base_url, str) else base_url.default
     
     print("Using web request tool")
     print(f"Method: {method}")
