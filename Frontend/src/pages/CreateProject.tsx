@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Pencil, Link, CloudUpload, ArrowLeft } from "lucide-react"
+import { Link, CloudUpload, ArrowLeft } from "lucide-react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
 
@@ -42,7 +42,7 @@ export default function CreateProject() {
     }
   }
 
-  const isFormValid = title && deployUrl && file && !isLoading
+  const isFormValid = title && deployUrl && url && file && !isLoading
 
   return (
     <form onSubmit={handleSubmit} className="max-w-screen-lg mx-auto p-4">
@@ -56,28 +56,17 @@ export default function CreateProject() {
             <span>Back</span>
           </button>
         </div>
-        <h1 className="text-4xl font-black tracking-tight lg:text-5xl text-indigo-600">Title</h1>
-        <div className="relative">
-          <Input
-            placeholder="Write the title of your project"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="peer w-full border-0 border-b-2 rounded-none border-indigo-600 focus:ring-0 focus:outline-none focus:border-indigo-800 hover:border-indigo-700 mt-5 pl-9"
-          />
-          <style jsx>{`
-            input:focus {
-              outline: none !important;
-              box-shadow: none !important;
-            }
-          `}</style>
-          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-            <Pencil className="h-4 w-4" />
-          </span>
-        </div>
+        <input
+          type="text"
+          placeholder="Write the title of your project"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="text-5xl font-bold outline-none border-b-2 border-transparent focus:border-indigo-600 focus:border-indigo-800t-5 h-20 w-full"
+        />
       </div>
 
       <div>
-        <h1 className="text-4xl font-black tracking-tight lg:text-5xl mt-5 text-indigo-600">Insert data</h1>
+        <h2 className="text-2xl font-black tracking-tight mt-5 text-indigo-600">Insert data</h2>
 
         <div className="relative">
           <Input
@@ -120,7 +109,7 @@ export default function CreateProject() {
 
       <Button
         type="submit"
-        className="mt-4 bg-indigo-600 hover:bg-indigo-500"
+        className="mt-8 bg-indigo-600 hover:bg-indigo-500"
         disabled={!isFormValid}
       >
         {isLoading ? "Creating..." : "Create"}
