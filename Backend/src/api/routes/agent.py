@@ -109,7 +109,8 @@ async def process_pentest_task(
     vulnerability_id: str,
     vulnerability_type: str,
     additional_context: str = None,
-    file_context: str = None
+    file_context: str = None,
+    line_number: int = None
 ):
     """Process pentest task and store results"""
     try:
@@ -151,8 +152,9 @@ async def process_pentest_task(
             vulnerability_type=vulnerability_type,
             additional_context=additional_context,
             endpoint=deployment_url,
-            file_context=file_context
-        )
+            file_context=file_context,
+            line_number=line_number
+        )   
         
         # Store success result
         await store_task_status(task_id, {
@@ -242,7 +244,8 @@ async def test_vulnerability(
         vulnerability_id=request.vulnerability_id,
         vulnerability_type=vulnerability["vulnerability"],
         additional_context=vulnerability.get("details"),
-        file_context=file_context
+        file_context=file_context,
+        line_number=start_line or None,
     )
     
     return {

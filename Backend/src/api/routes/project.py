@@ -152,3 +152,16 @@ async def get_all_projects():
         return projects
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching projects: {str(e)}")
+
+@router.get("/get_project/{project_id}")
+async def get_project(project_id: str):
+    """Get a specific project from the database"""
+    try:    
+        db = await get_database()
+        project = await db.projects.find_one({"_id": ObjectId(project_id)})
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        project["_id"] = str(project["_id"])
+        return project
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching projects: {str(e)}")
