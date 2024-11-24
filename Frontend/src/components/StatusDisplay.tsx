@@ -1,4 +1,4 @@
-import { TriangleAlert, CircleCheck, Clock3, CircleX } from "lucide-react";
+import { TriangleAlert, CircleCheck, Loader2, CircleX } from "lucide-react";
 
 
 interface StatusProps {
@@ -12,7 +12,7 @@ function StatusDisplay({ status }: StatusProps) {
             Icon = CircleX;
             break;
         case "processing":
-            Icon = Clock3;
+            Icon = Loader2;
             break;
         case "completed":
             Icon = CircleCheck;
@@ -24,8 +24,11 @@ function StatusDisplay({ status }: StatusProps) {
 
     return (
         <div className="flex items-center capitalize">
-            {Icon && <Icon className="mr-1 h-4 w-4" />}
-            {status}
+            {Icon && <Icon className={`mr-1 h-4 w-4 ${status === "completed" ? "text-green-500" : ""}
+                ${status === "failed" ? "text-red-500" : ""}
+                ${status === "not_started" ? "text-yellow-500" : ""}
+                ${status === "processing" ? "animate-spin" : ""}`} />}
+            {status.replace('_', ' ')}
         </div>
     )
 }
