@@ -11,8 +11,14 @@ import traceback
 import os
 from pathlib import Path
 from src.api.utils.vulnerabilities import get_vulnerabilities_by_id
+from urllib.parse import urlparse
 
 router = APIRouter()
+
+REPO_BASE_PATHS = {
+    "https://github.com/juice-shop/juice-shop": Path("data/juice-shop"),
+    "https://github.com/DiogoMRSilva/websitesVulnerableToSSTI": Path("data/websitesVulnerableToSSTI")
+}
 
 class VulnerabilityTestRequest(BaseModel):
     project_id: str
@@ -62,21 +68,26 @@ async def store_task_status(task_id: str, status: Dict):
             {"$set": vulnerability_update}
         )
 
-async def get_file_context(file_path: str, line_number: int, context_lines: int = 10) -> str:
+async def get_file_context(file_path: str, line_number: int, repo_url: str, context_lines: int = 10) -> str:
     """
     Get file context around specific line number with additional lines above and below.
     
     Args:
-        file_path: Relative path to the file from /data/juice-shop
+        file_path: Relative path to the file
         line_number: Target line number
+        repo_url: Repository URL to determine base path
         context_lines: Number of lines to include above and below (default 10)
     
     Returns:
         String containing the file context with line numbers
     """
     try:
+        # Get base path for repository
+        base_path = REPO_BASE_PATHS.get(repo_url)
+        if not base_path:
+            return f"Unsupported repository: {repo_url}"
+            
         # Convert relative path to absolute path
-        base_path = Path("data/juice-shop")
         abs_path = base_path / file_path.lstrip('/')
         
         if not abs_path.exists():
@@ -108,6 +119,7 @@ async def process_pentest_task(
     project_id: str,
     vulnerability_id: str,
     vulnerability_type: str,
+    repo_url: str,
     additional_context: str = None,
     file_context: str = None,
     line_number: int = None
@@ -118,7 +130,11 @@ async def process_pentest_task(
         if file_context and ":" in file_context:
             file_path, line_num = file_context.split(":")
             line_num = int(line_num)
-            file_context = await get_file_context(file_path, line_num)
+            file_context = await get_file_context(
+                file_path=file_path,
+                line_number=line_num,
+                repo_url=repo_url
+            )
             
         print("Got file context:", file_context)
         
@@ -185,6 +201,16 @@ async def test_vulnerability(
     """
     Start a new pentest task
     """
+    # Get project details including repo URL
+    db = await get_database()
+    project = await db.projects.find_one({"_id": ObjectId(request.project_id)})
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    repo_url = project.get("url")
+    if not repo_url:
+        raise HTTPException(status_code=400, detail="Project repository URL not found")
+
     # Get vulnerability details from project
     vulnerabilities = await get_vulnerabilities_by_id(request.project_id)
     if not vulnerabilities:
@@ -248,6 +274,7 @@ async def test_vulnerability(
         additional_context=vulnerability.get("details"),
         file_context=file_context,
         line_number=middle_line or None,
+        repo_url=repo_url
     )
     
     return {
